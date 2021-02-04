@@ -19,6 +19,7 @@
 #
 import os
 import sys
+import sphinx_rtd_theme
 sys.path.insert(0, os.path.abspath('..'))
 
 import pnp_mace_demo
@@ -77,20 +78,39 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
+# The name of the Pygments (syntax highlighting) style to use.
+pygments_style = 'sphinx'
 
-# -- Options for HTML output -------------------------------------------
+# -- Options for Napoleon -----------------------------------------------------
+
+napoleon_google_docstring = True
+napoleon_numpy_docstring = True
+napoleon_include_private_with_doc = False
+napoleon_include_special_with_doc = False
+napoleon_use_admonition_for_examples = False
+napoleon_use_admonition_for_notes = False
+napoleon_use_admonition_for_references = False
+napoleon_use_ivar = False
+napoleon_use_param = False
+napoleon_use_rtype = False
+
+# -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
-# Theme options are theme-specific and customize the look and feel of a
-# theme further.  For a list of options available for each theme, see the
-# documentation.
-#
-# html_theme_options = {}
+html_theme_options = {
+    'style_nav_header_background': '#4f8fb8ff',
+    'collapse_navigation': False,
+}
 
+html_logo = '../PnP-MACE-Logo.svg'
+
+# Output file base name for HTML help builder.
+htmlhelp_basename = project + 'doc'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
