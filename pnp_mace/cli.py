@@ -1,17 +1,17 @@
-"""Console script for pnp_mace_demo."""
+"""Console script for pnp_mace."""
 import argparse
 import sys
 
 
 def main():
-    """Console script for pnp_mace_demo."""
+    """Console script for pnp_mace."""
     parser = argparse.ArgumentParser()
     parser.add_argument('_', nargs='*')
     args = parser.parse_args()
 
     print("Arguments: " + str(args._))
     print("Replace this message by putting your code into "
-          "pnp_mace_demo.cli.main")
+          "pnp_mace.cli.main")
     return 0
 
 

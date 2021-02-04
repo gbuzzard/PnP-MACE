@@ -8,13 +8,13 @@ Installation
 Stable release
 --------------
 
-To install PnP-MACE-Demo, run this command in your terminal:
+To install PnP-MACE, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install pnp_mace_demo
+    $ pip install pnp_mace
 
-This is the preferred method to install PnP-MACE-Demo, as it will always install the most recent stable release.
+This is the preferred method to install PnP-MACE, as it will always install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -26,19 +26,19 @@ you through the process.
 From sources
 ------------
 
-The sources for PnP-MACE-Demo can be downloaded from the `Github repo`_.
+The sources for PnP-MACE can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/gbuzzard/pnp_mace_demo
+    $ git clone git://github.com/gbuzzard/pnp_mace
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl -OJL https://github.com/gbuzzard/pnp_mace_demo/tarball/master
+    $ curl -OJL https://github.com/gbuzzard/pnp_mace/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/gbuzzard/pnp_mace_demo
-.. _tarball: https://github.com/gbuzzard/pnp_mace_demo/tarball/master
+.. _Github repo: https://github.com/gbuzzard/pnp_mace
+.. _tarball: https://github.com/gbuzzard/pnp_mace/tarball/master

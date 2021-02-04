@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 
-"""Tests for `pnp_mace_demo` package."""
+"""Tests for `pnp_mace` package."""
 
 
 import unittest
 
-from pnp_mace_demo import pnp_mace_demo
+import pnp_mace as pnpm
 
 
-class TestPnp_mace_demo(unittest.TestCase):
-    """Tests for `pnp_mace_demo` package."""
+class TestPnp_mace(unittest.TestCase):
+    """Tests for `pnp_mace` package."""
 
     def setUp(self):
         """Set up test fixtures, if any."""

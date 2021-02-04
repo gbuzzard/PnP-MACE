@@ -1,1 +1,1 @@
-"""Unit test package for pnp_mace_demo."""
+"""Unit test package for pnp_mace."""

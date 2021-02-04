@@ -25,5 +25,5 @@ deploy:
     secure: PLEASE_REPLACE_ME
   on:
     tags: true
-    repo: gbuzzard/pnp_mace_demo
+    repo: gbuzzard/pnp_mace
     python: 3.8

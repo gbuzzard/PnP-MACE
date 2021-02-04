@@ -6,14 +6,14 @@
 
 
 ..
-    .. image:: https://img.shields.io/pypi/v/pnp_mace_demo.svg
-        :target: https://pypi.python.org/pypi/pnp_mace_demo
+    .. image:: https://img.shields.io/pypi/v/pnp_mace.svg
+        :target: https://pypi.python.org/pypi/pnp_mace
 
-    .. image:: https://img.shields.io/travis/gbuzzard/pnp_mace_demo.svg
-        :target: https://travis-ci.com/gbuzzard/pnp_mace_demo
+    .. image:: https://img.shields.io/travis/gbuzzard/pnp_mace.svg
+        :target: https://travis-ci.com/gbuzzard/pnp_mace
 
-    .. image:: https://readthedocs.org/projects/pnp-mace-demo/badge/?version=latest
-        :target: https://pnp-mace-demo.readthedocs.io/en/latest/?badge=latest
+    .. image:: https://readthedocs.org/projects/pnp-mace/badge/?version=latest
+        :target: https://pnp-mace.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
 |
@@ -21,7 +21,7 @@
 This python package includes demonstrations of the PnP algorithm and MACE framework on simple image reconstruction problems.
 
 * Free software: BSD license
-* Documentation: https://pnp-mace-demo.readthedocs.io.
+* Documentation: https://pnp-mace.readthedocs.io.
 
 
 Features

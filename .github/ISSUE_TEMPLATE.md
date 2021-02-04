@@ -1,4 +1,4 @@
-* PnP-MACE-Demo version:
+* PnP-MACE version:
 * Python version:
 * Operating System:
 

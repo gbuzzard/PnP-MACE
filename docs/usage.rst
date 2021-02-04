@@ -2,6 +2,10 @@
 Usage
 =====
 
-To use PnP-MACE-Demo in a project::
+To use PnP-MACE in a project::
 
-    import pnp_mace_demo
+    import pnp_mace
+
+or::
+
+    import pnp_mace as pnpm

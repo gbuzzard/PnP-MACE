@@ -1,4 +1,4 @@
-"""Top-level package for PnP-MACE-Demo."""
+"""Top-level package for PnP-MACE."""
 
 __author__ = """Gregery T. Buzzard"""
 __email__ = 'buzzard@purdue.edu'
