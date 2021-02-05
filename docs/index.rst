@@ -16,7 +16,6 @@ Indices and tables
    readme
    installation
    usage
-   modules
 
 .. toctree::
    :hidden:
