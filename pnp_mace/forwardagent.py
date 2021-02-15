@@ -16,9 +16,10 @@ class ForwardAgent(Agent):
         Define the basic elements of the forward agent: the data to fit and the
         method used to update the input to reflect the data.
 
-        :param data_to_fit: data in form used by forward_agent_method
-        :param forward_agent_method: method to update input to reflect data
-        :param params: parameters used by the forward agent method
+        Args:
+            data_to_fit: data in form used by forward_agent_method
+            forward_agent_method: method to update input to reflect data
+            params: parameters used by the forward agent method
         """
         super().__init__()
         self.data = data_to_fit
@@ -29,8 +30,11 @@ class ForwardAgent(Agent):
         """
         Apply the update method one time
 
-        :param agent_input: The current reconstruction
-        :return: The reconstruction after one application of the forward method
+        Args:
+            agent_input: The current reconstruction
+
+        Returns:
+            The reconstruction after one application of the forward method
         """
         return self.method(self.data, agent_input, self.params)
 
@@ -42,13 +46,16 @@ def prox_decimation(data_to_fit, agent_input, params):
     """
     Proximal map for downsampling forward model ~ ||y - Ax||^2 with A a block averaging matrix
 
-    :param data_to_fit:  downsampled image data (block mean)
-    :param agent_input: full-size reconstruction
-    :param params:  params.alpha and params.sigmasq for step size,
+    Args:
+        data_to_fit:  downsampled image data (block mean)
+        agent_input: full-size reconstruction
+        params:  params.alpha and params.sigmasq for step size,
                     params.factor for downsampling factor
                     params.resample for interpolation type as in PIL.Image.py
                     NEAREST = NONE = 0, LANCZOS = 1, BILINEAR = 2, BICUBIC = 3, BOX = 4, HAMMING = 5
-    :return:  new full-size reconstruction after update
+
+    Returns:
+        new full-size reconstruction after update
     """
     factor = params.factor
     resample = 0
@@ -67,11 +74,14 @@ def prox_fullsize(data_to_fit, agent_input, params):
     """
     Proximal map for upsampled data forward model ~ ||A^T y - x||^2 with A^T block replication
 
-    :param data_to_fit: downsampled image data (block mean)
-    :param agent_input: full-size reconstruction
-    :param params: params.alpha and params.sigmasq for step size and
+    Args:
+        data_to_fit: downsampled image data (block mean)
+        agent_input: full-size reconstruction
+        params: params.alpha and params.sigmasq for step size and
                     params.factor for downsampling factor
-    :return: new full-size reconstruction after update
+
+    Returns:
+        new full-size reconstruction after update
     """
     factor = params.factor
     resample = 0

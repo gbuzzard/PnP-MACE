@@ -24,8 +24,9 @@ class PriorAgent(Agent):
         Define the basic elements of the prior agent: the data to fit and the method
         used to update the input to reflect the data.
 
-        :param prior_agent_method: method to update input to reflect data
-        :param params: parameters used by the prior agent method
+        Args:
+            prior_agent_method: method to update input to reflect data
+            params: parameters used by the prior agent method
         """
         super().__init__()
         self.method = prior_agent_method
@@ -35,8 +36,11 @@ class PriorAgent(Agent):
         """
         Apply the update method one time
 
-        :param agent_input: The current reconstruction
-        :return: The reconstruction after one application of the prior method
+        Args:
+            agent_input: The current reconstruction
+
+        Returns:
+            The reconstruction after one application of the prior method
         """
         return self.method(agent_input, self.params)
 
@@ -48,9 +52,12 @@ def tv1_2d(agent_input, params):
     """
     Proximal map for L1 total variation
 
-    :param agent_input: full-size reconstruction
-    :param params:  params.noise_std for noise standard deviation
-    :return:  new full-size reconstruction after update
+    Args:
+        agent_input: full-size reconstruction
+        params:  params.noise_std for noise standard deviation
+
+    Returns:
+        New full-size reconstruction after update
     """
     noise_var = params.noise_std**2
     return ptv.tv1_2d(agent_input, noise_var)
@@ -60,9 +67,12 @@ def tv2_2d(agent_input, params):
     """
     Proximal map for L2 total variation
 
-    :param agent_input: full-size reconstruction
-    :param params:  params.noise_std for noise standard deviation
-    :return:  new full-size reconstruction after update
+    Args:
+        agent_input: full-size reconstruction
+        params:  params.noise_std for noise standard deviation
+
+    Returns:
+        New full-size reconstruction after update
     """
     noise_var = params.noise_std**2
     return ptv.tvp_2d(agent_input, noise_var, noise_var, 2, 2)
@@ -72,9 +82,12 @@ def bm3d_agent(agent_input, params):
     """
     BM3D agent
 
-    :param agent_input: full-size reconstruction
-    :param params:  params.noise_std for noise standard deviation
-    :return:  new full-size reconstruction after update
+    Args:
+        agent_input: full-size reconstruction
+        params:  params.noise_std for noise standard deviation
+
+    Returns:
+        New full-size reconstruction after update
     """
 
     return bm3d(agent_input, params.noise_std)
