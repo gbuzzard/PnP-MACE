@@ -1,52 +1,46 @@
 import numpy as np
-from pnp_mace.utils import load_img, display_img_console, downscale, upscale
-from experiment_funcs import get_experiment_noise, get_psnr, get_cropped_psnr
+import pnp_mace.utils as utils
 import pnp_mace.prioragent as prior
 import pnp_mace.forwardagent as forward
 from pnp_mace.equilibriumproblem import *
 from dotmap import DotMap
 from PIL import Image
-import matplotlib.pyplot as plt
-
 
 if __name__ == '__main__':
 
-    img_path = "./images/image_0002.jpg"  # original image is loaded to this path
-    ground_truth = load_img(img_path)  # create the image
-    # display_img_console(ground_truth, title="Original")
+    img_path = "https://www.math.purdue.edu/~buzzard/software/cameraman_clean.jpg"  # original image is loaded to this path
+    ground_truth = utils.load_img(img_path)  # create the image
+    utils.display_img_console(ground_truth, title="Original")
 
     #########################
     # Adjust shape as needed to allow for up/down sampling
-    factor = 8
-    new_size = factor * np.floor(ground_truth.shape / np.double(factor))
-    new_size = new_size.astype(np.int)
-    ground_truth = ground_truth[:new_size[0], :new_size[1]]
-    clean_data = downscale(ground_truth, factor)
+    factor = 4
+    new_size = factor * np.floor(ground_truth.size / np.double(factor))
+    new_size = new_size.astype(int)
+    ground_truth = ground_truth.crop((0, 0, new_size[0], new_size[1]))
+    resample = Image.NONE # NEAREST = NONE = 0, LANCZOS = 1, BILINEAR = 2, BICUBIC = 3, BOX = 4, HAMMING = 5
+    clean_data = utils.downscale(ground_truth, factor, resample)
+    utils.display_img_console(clean_data, title="Downsampled")
 
     #########################
-    # Create data using BM3D demo
-    # Possible noise types to be generated 'gw', 'g1', 'g2', 'g3', 'g4', 'g1w',
-    # 'g2w', 'g3w', 'g4w'.
-    noise_type = 'gw'
-    noise_var = 0.0001  # Noise variance
+    # Create noisy data
+    noise_std = 0.1  # Noise standard deviation
     seed = 0  # seed for pseudorandom noise realization
 
-    # Generate noise with given PSD
-    noise, psd, kernel = get_experiment_noise(noise_type, noise_var, seed, clean_data.shape)
-    # N.B.: For the sake of simulating a more realistic acquisition scenario,
-    # the generated noise is *not* circulant. Therefore there is a slight
-    # discrepancy between PSD and the actual PSD computed from infinitely many
-    # realizations of this noise with different seeds.
+    # Generate noisy image
+    # Note: the BM3D demos have examples to show how to create additive spatially correlated noise
+    noisy_image = utils.add_noise(clean_data, noise_std, seed)
+    init_image = utils.upscale(noisy_image, factor, Image.BICUBIC)  # initial image for PnP #
 
-    # Generate noisy image corrupted by additive spatially correlated noise
-    # with noise power spectrum PSD
-    noise = np.squeeze(noise)
-    noisy_data = clean_data + noise
-    init_image =  upscale(noisy_data, factor, Image.BICUBIC)  # ground_truth  #
+    # Display
+    utils.display_img_console(noisy_image, title="Noisy data")
+    utils.nrmse = utils.nrmse(init_image, ground_truth)
+    title = "Initial reconstruction, nrmse = " + str(utils.nrmse)
+    utils.display_img_console(init_image, title=title)
 
     #########################
     # Set up the forward agent
-    forward_agent_method = forward.prox_decimation  # forward.prox_fullsize  #
+    forward_agent_method = forward.prox_downsample  # forward.prox_fullsize  #
 
     forward_params = DotMap()
     forward_params.factor = factor
@@ -54,7 +48,7 @@ if __name__ == '__main__':
     forward_params.sigmasq = 0.01
     forward_params.resample = Image.BICUBIC
 
-    for_agent = forward.ForwardAgent(noisy_data, forward_agent_method, forward_params)
+    for_agent = forward.ForwardAgent(noisy_image, forward_agent_method, forward_params)
 
     from scipy.sparse.linalg import eigs, LinearOperator
 
@@ -119,16 +113,16 @@ if __name__ == '__main__':
     # denoise image (filter using 2D TV-L1, noise level = 0.03)
     denoiser = ptv.tv1_2d
     img_denoise = denoiser(ground_truth, 0.03)
-    display_img_console(img_denoise, title="Denoised")
+    utils.display_img_console(img_denoise, title="Denoised")
 
-    # downscale image by local averaging
+    # utils.downscale image by local averaging
     factor = 8
-    img_downscaled = downscale(ground_truth, factor)
-    display_img_console(img_downscaled, title="Downscaled")
-    print(img_downscaled.shape)
+    img_utils.downscaled = utils.downscale(ground_truth, factor)
+    utils.display_img_console(img_utils.downscaled, title="utils.downscaled")
+    print(img_utils.downscaled.shape)
 
-    b = upscale(img_downscaled, factor)
-    display_img_console(b, title="Upscaled")
+    b = utils.upscale(img_utils.downscaled, factor)
+    utils.display_img_console(b, title="utils.upscaled")
     # with napari.gui_qt():
     #     viewer = napari.view_image(b, rgb=False)
 
