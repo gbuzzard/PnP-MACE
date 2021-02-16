@@ -3,7 +3,8 @@ scipy~=1.6.0
 bm3d~=3.0.8
 setuptools~=53.0.0
 Pillow~=8.1.0
-scikit-image~=0.18.1
 matplotlib~=3.3.4
 dotmap~=1.3.23
 prox_tv~=3.3.0
+
+requests~=2.25.1
