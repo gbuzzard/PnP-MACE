@@ -1,4 +1,4 @@
-from agent import *
+import pnp_mace.agent as agent
 
 # prox_tv denoiser:  https://pythonhosted.org/prox_tv/
 import prox_tv as ptv
@@ -14,7 +14,7 @@ from bm3d import bm3d
 # prior agent methods.
 
 
-class PriorAgent(Agent):
+class PriorAgent(agent.Agent):
     """
     Class to provide a container and interface to various prior models.
     """

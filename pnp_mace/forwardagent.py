@@ -1,12 +1,12 @@
-from utils import upscale, downscale
-from agent import *
+import pnp_mace.utils as utils
+import pnp_mace.agent as agent
 import numpy as np
 
 # This file contains the class declaration for ForwardAgent as well as particular
 # forward agent methods.
 
 
-class ForwardAgent(Agent):
+class ForwardAgent(agent.Agent):
     """
     Class to provide a container and interface to various forward models.
     """
@@ -42,17 +42,32 @@ class ForwardAgent(Agent):
 ######################
 # Particular forward agent methods
 
-def prox_decimation(data_to_fit, agent_input, params):
+def prox_downsample(data_to_fit, agent_input, params):
     """
-    Proximal map for downsampling forward model ~ ||y - Ax||^2 with A a block averaging matrix
+    Proximal map for downsampling forward model ~ ||y - Ax||^2 where A is a downsampling matrix
+    The proximal map has the form
+
+    .. math::
+       F(x) = \mathrm{argmin}_v \;
+        (1/2) \| y - Av \|^2 + (1 / (2\sigma^2)) \| x - v \|^2
+
+    This can be shown to be
+
+    .. math::
+       F(x) = x + \sigma^2 A^T(I + \sigma^2 A A^T)^{-1} (y - Ax)
+
+    As shown in a paper by Emma Reid, et al., replacing the linear map applied to y-Ax in this last expression is
+    equivalent to changing the prior agent. This can be achieved in this function by choosing the upsampling and
+    downsampling parameters separately.
 
     Args:
-        data_to_fit:  downsampled image data (block mean)
-        agent_input: full-size reconstruction
+        data_to_fit:  downsampled image data, assumed to be noise plus A applied to a clean image
+        agent_input: current full-size reconstruction
         params:  params.alpha and params.sigmasq for step size,
                     params.factor for downsampling factor
-                    params.resample for interpolation type as in PIL.Image.py
+                    params.downsample for downsampling type as in PIL.Image.py - default is NEAREST (subsampling)
                     NEAREST = NONE = 0, LANCZOS = 1, BILINEAR = 2, BICUBIC = 3, BOX = 4, HAMMING = 5
+                    params.upsample for upsampling type (same possible values) - default is the same as params.downsample
 
     Returns:
         new full-size reconstruction after update
@@ -61,11 +76,13 @@ def prox_decimation(data_to_fit, agent_input, params):
     resample = 0
     if "resample" in params:
         resample = min([params.resample, 5])
+    else:
+        resample = 0
     x = agent_input
-    cAx = downscale(x, factor)  # This is (1/factor^2) A, where A is block sum
+    cAx = utils.downscale(x, factor, resample)
     y = data_to_fit
     diff = cAx - y
-    unscaled_step = upscale(diff, factor, resample)  # This is A.T if resample=0, otherwise another upscaling matrix
+    unscaled_step = utils.upscale(diff, factor, resample)
     scaled_step = (params.alpha / params.sigmasq) * unscaled_step
     return x - scaled_step
 
@@ -87,7 +104,7 @@ def prox_fullsize(data_to_fit, agent_input, params):
     resample = 0
     x = agent_input
     y = data_to_fit
-    ATy = upscale(y, factor, resample)
+    ATy = utils.upscale(y, factor, resample)
     diff = x - ATy
     scaled_step = (params.alpha / (1 + params.sigmasq)) * diff
     return x - scaled_step
