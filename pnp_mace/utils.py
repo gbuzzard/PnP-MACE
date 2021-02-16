@@ -1,8 +1,8 @@
 import numpy as np
-import skimage as ski
-from skimage import io, color, transform
 import matplotlib.pyplot as plt
 from PIL import Image
+import requests
+from io import BytesIO
 
 
 def load_img(path):
@@ -10,59 +10,63 @@ def load_img(path):
     Given the image path, return the image.
 
     Args:
-        path: data path.
+        path: data path, may be local or url as a string beginning with http.
 
     Returns:
         Grayscale image
     """
 
-    local_image = io.imread(path)  # read image
-    local_image = ski.img_as_float(local_image)
-    local_image = color.rgb2gray(local_image)
+    if path[0:4] == "http":
+        response = requests.get(path)
+        local_image = Image.open(BytesIO(response.content))
+    else:
+        local_image = Image.open(path)  # read image
+
+    local_image = local_image.convert('L')
+    local_image = local_image.convert('F')
 
     return local_image
 
 
-def display_img_console(local_img, title="", cmap='gray'):
+def display_img_console(input_image, title="", cmap='gray'):
     """
     Display an image in console using matplotlib.pyplot
 
     Args:
         title: title for the plot
         cmap: colormap for image display
-        local_img: image to be displayed
+        input_image: image to be displayed
     """
-    plt.imshow(local_img, cmap=cmap)
+    plt.imshow(input_image, cmap=cmap)
     plt.colorbar()
     plt.title(title)
     plt.show()
 
 
-def downscale(local_img, scale_factor):
+def downscale(input_image, scale_factor, resample):
     """
-    Downscale the image by the given factor in each
-    direction using block averaging.  The image is 0-padded at the end
-    if needed.  This could probably be done more efficiently in a way
-    closer to upscale.
+    Downscale the image by the given factor in each direction
+    using replication
 
     Args:
-        local_img: input image
-        scale_factor: downscale factor
+        input_image: input image as a numpy array
+        scale_factor: upscale factor
+        resample: interpolation type as in PIL.Image.py
+                    NEAREST = NONE = 0, LANCZOS = 1, BILINEAR = 2, BICUBIC = 3, BOX = 4, HAMMING = 5
 
     Returns:
         Downscaled image
     """
-    new_img = ski.transform.downscale_local_mean(local_img, (scale_factor, scale_factor))
-    return new_img
+    return upscale(input_image, 1/scale_factor, resample)
 
 
-def upscale(local_img, scale_factor, resample):
+def upscale(input_image, scale_factor, resample):
     """
     Upscale the image by the given factor in each direction
     using replication
 
     Args:
-        local_img: input image as a numpy array
+        input_image: input image
         scale_factor: upscale factor
         resample: interpolation type as in PIL.Image.py
                     NEAREST = NONE = 0, LANCZOS = 1, BILINEAR = 2, BICUBIC = 3, BOX = 4, HAMMING = 5
@@ -70,10 +74,39 @@ def upscale(local_img, scale_factor, resample):
     Returns:
         Upscaled image
     """
-    im = Image.fromarray(local_img)
-    im = im.resize(scale_factor * np.array(im.size), resample)
-    new_img = np.array(im)
+    new_img = input_image.copy()
+    return new_img.resize(np.round(scale_factor * np.array(input_image.size)).astype(np.int), resample)
 
-    return new_img
 
+def nrmse(image, reference):
+    """
+    Args:
+        image: input image to be compared with reference
+        reference: reference image
+
+    Returns:
+        Root mean square error of the difference of image and reference, divided by the root mean square of the reference
+    """
+    nrmse = np.sqrt(np.mean((np.asarray(image) - np.asarray(reference)) ** 2)) / np.sqrt(np.mean(np.asarray(reference)**2))
+    return np.round(nrmse, decimals=3)
+
+
+def add_noise(clean_image, noise_std, seed=None):
+    """
+    Args:
+        clean_image: input image
+        noise_std: standard deviation of noise to be added
+        seed: seed for random number generator
+
+    Returns:
+        image with noise added, clipped to valid range of values
+    """
+    if seed is not None:
+        np.random.seed(seed)
+    noise = noise_std * np.random.standard_normal(clean_image.size)
+    noise = np.squeeze(noise)
+    noisy_data = np.asarray(clean_image) / 255.0 + noise
+    noisy_data = np.clip(noisy_data, 0, 1)
+    noisy_image = Image.fromarray(np.round(255.0 * noisy_data).astype(np.int32))
+    return noisy_image
 
