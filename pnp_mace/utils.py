@@ -110,3 +110,24 @@ def add_noise(clean_image, noise_std, seed=None):
     noisy_image = Image.fromarray(np.round(255.0 * noisy_data).astype(np.int32))
     return noisy_image
 
+
+def prox_approximation(x, data, cost_function, sigma, cost_params):
+    r"""
+        Return an approximate solution to
+
+        .. math::
+           F(x) = \mathrm{argmin}_v \; f(v, data, params) + (1 / (2\sigma^2)) \| x - v \|^2
+
+        Args:
+            x: Candidate reconstruction
+            data: Data to fit or None for a prior cost function
+            cost_function: function that accepts (v, data, params), where v is a candidate reconstruction and
+                           data is the data to be fit, and returns a cost
+            sigma: estimate of desired step size - small sigma leads to small steps
+            cost_params: parameters used by the cost function
+
+        Returns:
+            An approximation of F(x) as defined above.
+    """
+    # TODO:  implement using sporco
+    pass
