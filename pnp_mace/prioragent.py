@@ -1,7 +1,4 @@
 import pnp_mace.agent as agent
-
-# prox_tv denoiser:  https://pythonhosted.org/prox_tv/
-import prox_tv as ptv
 from bm3d import bm3d
 
 # TODO:
@@ -48,9 +45,9 @@ class PriorAgent(agent.Agent):
 # Particular prior agent methods
 
 
-def tv1_2d(agent_input, params):
+def tv_2d(agent_input, params):
     """
-    Proximal map for L1 total variation
+    Proximal map for anisotropic total variation
 
     Args:
         agent_input: full-size reconstruction
@@ -59,13 +56,13 @@ def tv1_2d(agent_input, params):
     Returns:
         New full-size reconstruction after update
     """
-    noise_var = params.noise_std**2
-    return ptv.tv1_2d(agent_input, noise_var)
+    # TODO:  implement using sporco
+    pass
 
 
-def tv2_2d(agent_input, params):
+def gradient_l2_2d(agent_input, params):
     """
-    Proximal map for L2 total variation
+    Proximal map for L2 gradient penalty
 
     Args:
         agent_input: full-size reconstruction
@@ -74,13 +71,13 @@ def tv2_2d(agent_input, params):
     Returns:
         New full-size reconstruction after update
     """
-    noise_var = params.noise_std**2
-    return ptv.tvp_2d(agent_input, noise_var, noise_var, 2, 2)
+    # TODO:  implement using sporco
+    pass
 
 
-def bm3d_agent(agent_input, params):
+def bm3d_method(agent_input, params):
     """
-    BM3D agent
+    BM3D prior
 
     Args:
         agent_input: full-size reconstruction
