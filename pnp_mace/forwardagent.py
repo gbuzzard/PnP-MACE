@@ -74,7 +74,7 @@ class ProxForwardAgent(ForwardAgent):
         self.previous_output = None
 
 
-class LinearProxForwardAgent(ProxForwardAgent):
+class LinearProxForwardAgent(ForwardAgent):
     r"""
     Class to provide a container and interface to a proximal map forward model for a cost function of the form
 
@@ -106,7 +106,7 @@ class LinearProxForwardAgent(ProxForwardAgent):
     instance variable.
     """
 
-    def __init__(self, data_to_fit, A, AT, sigma, params):
+    def __init__(self, data_to_fit, A, AT, sigma):
         r"""
         Define the basic elements of the forward agent: the data to fit and the data-fitting
         cost function (determined by the forward and back projectors A and AT).
@@ -123,12 +123,12 @@ class LinearProxForwardAgent(ProxForwardAgent):
             A: linear operator - forward projector
             AT: linear operator - back projector (see notes above on mismatched back-projection)
             sigma: estimate of desired step size - small sigma leads to small steps
-            params: parameters used by the cost function
         """
         def forward_agent_method(data, x, cost_params):
             return self.linear_prox_implicit_step(x, data, A, AT, sigma**2)
 
-        super().__init__(data_to_fit, forward_agent_method, sigma, params)
+        params = None
+        super().__init__(data_to_fit, forward_agent_method, params)
         self.previous_output = None
 
     def restart(self):
@@ -160,7 +160,7 @@ class LinearProxForwardAgent(ProxForwardAgent):
         if v is None:
             # Apply one gradient descent step to initialize v
             self.previous_output = x
-            self.linear_prox_implicit_step(x, data, A, AT, sigmasq)
+            v = self.linear_prox_implicit_step(x, data, A, AT, sigmasq)
 
         # Check on the type of A and apply it appropriately
         if callable(A):
@@ -169,13 +169,16 @@ class LinearProxForwardAgent(ProxForwardAgent):
             Av = np.matmul(A, v)
         # Get the data difference
         y = data
-        diff = y - Av
+
         # Check on the type of AT and apply it appropriately
+        diff = y - Av
         if callable(AT):
             step = AT(diff)
         else:
             step = np.matmul(AT, diff)
         # Take a step
         scaled_step = sigmasq * step
-        return x + scaled_step
+        new_x = x + scaled_step
+        self.previous_output = np.copy(new_x)
+        return new_x
 
