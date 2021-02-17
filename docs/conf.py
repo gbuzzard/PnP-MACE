@@ -32,7 +32,34 @@ import pnp_mace
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
+extensions = [
+    "sphinx.ext.napoleon",
+    "sphinx.ext.autodoc",
+    "sphinx_autodoc_typehints",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.viewcode",
+#    "sphinxcontrib.bibtex"
+]
+
+#bibtex_bibfiles = ["refs.bib"]
+
+
+autosummary_generate = True
+autoclass_content = "both"
+add_function_parentheses = False
+
+
+# Sort members by type
+autodoc_member_order = "bysource"
+autodoc_default_options = {
+    "member-order": "bysource",
+    "inherited-members": True,
+    "show-inheritance": True,
+}
+autodoc_docstring_signature = True
+
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -81,17 +108,25 @@ todo_include_todos = False
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
+
+# Intersphinx mapping
+intersphinx_mapping = {
+    "https://docs.python.org/3/": None,
+    "https://docs.scipy.org/doc/numpy/": None,
+    "https://docs.scipy.org/doc/scipy/reference/": None
+}
+
 # -- Options for Napoleon -----------------------------------------------------
 
 napoleon_google_docstring = True
-napoleon_numpy_docstring = True
-napoleon_include_private_with_doc = False
-napoleon_include_special_with_doc = False
-napoleon_use_admonition_for_examples = False
-napoleon_use_admonition_for_notes = False
-napoleon_use_admonition_for_references = False
-napoleon_use_ivar = False
-napoleon_use_param = False
+#napoleon_numpy_docstring = True
+#napoleon_include_private_with_doc = False
+#napoleon_include_special_with_doc = False
+#napoleon_use_admonition_for_examples = False
+#napoleon_use_admonition_for_notes = False
+#napoleon_use_admonition_for_references = False
+napoleon_use_ivar = True
+#napoleon_use_param = False
 napoleon_use_rtype = False
 
 # -- Options for HTML output -------------------------------------------------
