@@ -2,6 +2,7 @@ import pnp_mace.utils as utils
 import pnp_mace.agent as agent
 import numpy as np
 
+
 # This file contains the class declaration for ForwardAgent as well as particular
 # forward agent methods.
 
@@ -47,18 +48,53 @@ class ProxAgent(ForwardAgent):
     Class to provide a container and interface to proximal map forward model.
     """
 
-    def __init__(self, data_to_fit, forward_agent_method, params):
-        """
+    def __init__(self, data_to_fit, cost_function, sigma, params):
+        r"""
         Define the basic elements of the forward agent: the data to fit and the
-        method used to update the input to reflect the data.
+        cost function used to promote data fitting.
 
-        See ForwardAgent for primary documentation.
+        This subclass focuses on proximal maps.  The cost function should have the form f(x, data, params), where x is a
+        candidate reconstruction and data is the data to fit.
 
-        This subclass focuses on proximal maps and includes an additional instance variable to keep the output of the
-        output previous update.
+        The implementation approximates a solution to
+
+        .. math::
+           F(x) = \mathrm{argmin}_v \; f(v, data, params) + (1 / (2\sigma^2)) \| x - v \|^2
+
+        Args:
+            data_to_fit: data in a form used by forward_agent_method
+            cost_function: function that accepts (v, data, params), where v is a candidate reconstruction and
+                           data is the data to be fit, and returns a cost
+            sigma: estimate of desired step size - small sigma leads to small steps
+            params: parameters used by the cost function
         """
+        def forward_agent_method(data, x, cost_params):
+            return prox_approximation(x, data, cost_function, sigma, cost_params)
+
         super().__init__(data_to_fit, forward_agent_method, params)
         self.previous_output = None
+
+
+def prox_approximation(x, data, cost_function, sigma, cost_params):
+    r"""
+        Return an approximate solution to
+
+        .. math::
+           F(x) = \mathrm{argmin}_v \; f(v, data, params) + (1 / (2\sigma^2)) \| x - v \|^2
+
+        Args:
+            x: Candidate reconstruction
+            data: Data to fit
+            cost_function: function that accepts (v, data, params), where v is a candidate reconstruction and
+                           data is the data to be fit, and returns a cost
+            sigma: estimate of desired step size - small sigma leads to small steps
+            cost_params: parameters used by the cost function
+
+        Returns:
+            An approximation of F(x) as defined above.
+    """
+    # TODO:  implement using sporco
+    pass
 
 
 def prox_downsample(data_to_fit, agent_input, params):
