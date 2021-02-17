@@ -16,6 +16,7 @@ Indices and tables
    readme
    installation
    usage
+   api
 
 .. toctree::
    :hidden:
