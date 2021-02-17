@@ -24,13 +24,14 @@ if __name__ == '__main__':
 
     #########################
     # Create noisy data
-    noise_std = 0.1  # Noise standard deviation
+    noise_std = 0.05  # Noise standard deviation
     seed = 0  # seed for pseudorandom noise realization
 
     # Generate noisy image
     # Note: the BM3D demos have examples to show how to create additive spatially correlated noise
     noisy_image = utils.add_noise(clean_data, noise_std, seed)
-    init_image = utils.upscale(noisy_image, factor, Image.BICUBIC)  # initial image for PnP #
+    init_image = utils.upscale(noisy_image, factor, Image.BICUBIC)  # initial image for PnP
+    init_image = utils.add_noise(init_image, 3*noise_std, seed)
 
     # Display
     utils.display_img_console(noisy_image, title="Noisy data")
@@ -40,31 +41,30 @@ if __name__ == '__main__':
 
     #########################
     # Set up the forward agent
-    forward_agent_method = forward.prox_downsample  # forward.prox_fullsize  #
+    downscale_type = Image.BICUBIC
+    upscale_type = Image.BICUBIC
 
-    forward_params = DotMap()
-    forward_params.factor = factor
-    forward_params.alpha = 0.01
-    forward_params.sigmasq = 0.01
-    forward_params.resample = Image.BICUBIC
+    def A(x): return np.asarray(utils.downscale(Image.fromarray(x), factor, downscale_type))
+    def AT(x): return np.asarray(utils.upscale(Image.fromarray(x), factor, upscale_type))
 
-    for_agent = forward.ForwardAgent(noisy_image, forward_agent_method, forward_params)
+    step_size = 0.1
+    forward_agent = forward.LinearProxForwardAgent(noisy_image, A, AT, step_size)
 
     #########################
     # Set up the prior agent
-    prior_agent_method = prior.tv1_2d  # prior.bm3d_agent
+    prior_agent_method = prior.bm3d_method
 
     prior_params = DotMap()
-    prior_params.noise_std = np.sqrt(noise_std)
+    prior_params.noise_std = 0.5
 
     prior_agent = prior.PriorAgent(prior_agent_method, prior_params)
 
     #########################
     # Set up the equilibrium problem
-    mu0 = 0.5  # Forward agent weight
+    mu0 = 0.1  # Forward agent weight
     mu = [mu0, 1 - mu0]
     rho = 0.5
-    num_iters = 1000
+    num_iters = 10
     keep_all_images = True
 
     equil_params = DotMap()
@@ -73,29 +73,30 @@ if __name__ == '__main__':
     equil_params.num_iters = num_iters
     equil_params.keep_all_images = keep_all_images
 
-    agents = [for_agent, prior_agent]
+    agents = [forward_agent, prior_agent]
     equil_prob = EquilibriumProblem(agents, mann_iteration_mace, equil_params)
 
-    tiled_images = np.tile(init_image[:,:,np.newaxis], (1,1,len(agents)))
     init_images = []
     for j in range(len(agents)):
-        init_images.append(tiled_images[:,:,j])
+        init_images.append(np.asarray(init_image.copy()))
 
     # Iterate as directed
     final_images, residuals, vectors, all_images = equil_prob.solve(init_images)
     v_sum = mu[0] * vectors[0] + mu[1] * vectors[1]
-    i0 = final_images[0]
-    view_stack = np.moveaxis(all_images, [0, 1, 2], [1,0,2])
-    np.save("view_stack.npy", view_stack)
-    residuals = np.array(residuals)
-    vectors = np.array(vectors)
-    with napari.gui_qt():
-        viewer1 = napari.view_image(noisy_data, rgb=False)
-        viewer2 = napari.view_image(v_sum, rgb=False)
-        viewer4 = napari.view_image(residuals, rgb=False)
-        if keep_all_images:
-            viewer4 = napari.view_image(view_stack, rgb=False, order=(2,1,0))
-        viewer5 = napari.view_image(vectors, rgb=False)
+    i0 = Image.fromarray(final_images[0])
+    title = "Final reconstruction, NRMSE = " + str(utils.nrmse(i0, ground_truth))
+    utils.display_img_console(i0, title=title)
+    # view_stack = np.moveaxis(all_images, [0, 1, 2], [1,0,2])
+    # np.save("view_stack.npy", view_stack)
+    # residuals = np.array(residuals)
+    # vectors = np.array(vectors)
+    # with napari.gui_qt():
+    #     viewer1 = napari.view_image(noisy_data, rgb=False)
+    #     viewer2 = napari.view_image(v_sum, rgb=False)
+    #     viewer4 = napari.view_image(residuals, rgb=False)
+    #     if keep_all_images:
+    #         viewer4 = napari.view_image(view_stack, rgb=False, order=(2,1,0))
+    #     viewer5 = napari.view_image(vectors, rgb=False)
 
 """
     # denoise image (filter using 2D TV-L1, noise level = 0.03)
