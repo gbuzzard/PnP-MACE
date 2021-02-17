@@ -2,7 +2,6 @@ import pnp_mace.utils as utils
 import pnp_mace.agent as agent
 import numpy as np
 
-
 # This file contains the class declaration for ForwardAgent as well as particular
 # forward agent methods.
 
@@ -40,17 +39,17 @@ class ForwardAgent(agent.Agent):
         return self.method(self.data, agent_input, self.params)
 
 
-######################
-# Prox  agent
+#############################
+# Proximal map forward  agent
 
-class ProxAgent(ForwardAgent):
+class ProxForwardAgent(ForwardAgent):
     """
     Class to provide a container and interface to proximal map forward model.
     """
 
     def __init__(self, data_to_fit, cost_function, sigma, params):
         r"""
-        Define the basic elements of the forward agent: the data to fit and the
+        Define the basic elements of the proximal map forward agent: the data to fit and the
         cost function used to promote data fitting.
 
         This subclass focuses on proximal maps.  The cost function should have the form f(x, data, params), where x is a
@@ -69,113 +68,114 @@ class ProxAgent(ForwardAgent):
             params: parameters used by the cost function
         """
         def forward_agent_method(data, x, cost_params):
-            return prox_approximation(x, data, cost_function, sigma, cost_params)
+            return utils.prox_approximation(x, data, cost_function, sigma, cost_params)
 
         super().__init__(data_to_fit, forward_agent_method, params)
         self.previous_output = None
 
 
-def prox_approximation(x, data, cost_function, sigma, cost_params):
+class LinearProxForwardAgent(ProxForwardAgent):
     r"""
-        Return an approximate solution to
+    Class to provide a container and interface to a proximal map forward model for a cost function of the form
 
-        .. math::
-           F(x) = \mathrm{argmin}_v \; f(v, data, params) + (1 / (2\sigma^2)) \| x - v \|^2
+    .. math::
+       f(x) = (1/2) \| y - Av \|^2
 
-        Args:
-            x: Candidate reconstruction
-            data: Data to fit
-            cost_function: function that accepts (v, data, params), where v is a candidate reconstruction and
-                           data is the data to be fit, and returns a cost
-            sigma: estimate of desired step size - small sigma leads to small steps
-            cost_params: parameters used by the cost function
-
-        Returns:
-            An approximation of F(x) as defined above.
-    """
-    # TODO:  implement using sporco
-    pass
-
-
-def prox_downsample(data_to_fit, agent_input, params):
-    r"""
-    Proximal map for downsampling forward model ~ ||y - Ax||^2 where A is a downsampling matrix
-    The proximal map has the form
+    The associated proximal map has the form
 
     .. math::
        F(x) = \mathrm{argmin}_v \;
-        (\alpha /2) \| y - Av \|^2 + (1 / (2\sigma^2)) \| x - v \|^2
+        (1/2) \| y - Av \|^2 + (1 / (2\sigma^2)) \| x - v \|^2
 
     The solution is
 
     .. math::
-       F(x) = x + \alpha \sigma^2 A^T(I + \alpha \sigma^2 A A^T)^{-1} (y - Ax)
+       F(x) = x + \sigma^2 A^T(I + \sigma^2 A A^T)^{-1} (y - Ax)
 
-    For large images, this is not practical unless A A^T is a multiple of the identity matrix, which is true for
+    This form is typically not practical unless A A^T is a multiple of the identity matrix, which is true for
     some important special cases, but not in general.
 
-    Instead of resorting to solving the optimization problem directly, F(x) = v* can be written as an implicit step by
+    Instead of solving the optimization problem as in the ProxAgent, F(x) = v* can be written as an implicit step using
 
     .. math::
        v^* = x + \alpha \sigma^2 A^T (y - Av^*)
 
     As in V. Sridhar, X. Wang, G. T. Buzzard and C. A. Bouman, "Distributed Iterative CT Reconstruction Using Multi-Agent
     Consensus Equilibrium," in IEEE Transactions on Computational Imaging, vol. 6, pp. 1153-1166, 2020,
-    doi: 10.1109/TCI.2020.3008782, we implement this version using the previous output of F(x), which is saved in an
-    instance variable (available through the superclass Agent).
-
-    Args:
-        data_to_fit:  downsampled image data, assumed to be noise plus A applied to a clean image
-        agent_input: current full-size reconstruction
-        params:  params.alpha and params.sigmasq for step size,
-                    params.factor for downsampling factor
-                    params.downsample for downsampling type as in PIL.Image.py - default is NEAREST (subsampling)
-                    NEAREST = NONE = 0, LANCZOS = 1, BILINEAR = 2, BICUBIC = 3, BOX = 4, HAMMING = 5
-                    params.upsample for upsampling type (same possible values) - default is the same as params.downsample
-
-    Returns:
-        new full-size reconstruction after update
+    doi: 10.1109/TCI.2020.3008782, we implement this version using the previous output of v* = F(x), which is saved in an
+    instance variable.
     """
-    factor = params.factor
-    downsample = 0
-    if "downsample" in params:
-        downsample = min([params.downsample, 5])
-    upsample = 0
-    if "upsample" in params:
-        upsample = min([params.upsample, 5])
 
-    x = agent_input
-    v = self.previous_output
-    cAx = utils.downscale(x, factor, downsample)
-    y = data_to_fit
-    diff = y - cAx
-    unscaled_step = utils.upscale(diff, factor, upsample)
-    scaled_step = (params.alpha / params.sigmasq) * unscaled_step
-    return x + scaled_step
+    def __init__(self, data_to_fit, A, AT, sigma, params):
+        r"""
+        Define the basic elements of the forward agent: the data to fit and the data-fitting
+        cost function (determined by the forward and back projectors A and AT).
 
+        As shown in a paper by Emma Reid, et al., replacing AT by a linear operator B that approximates AT is
+        equivalent to changing the prior agent.  In some contexts, this is known as mismatched back-projection.
 
-def prox_fullsize(data_to_fit, agent_input, params):
-    """
-    As shown in a paper by Emma Reid, et al., replacing the linear map applied to y-Ax in this last expression is
-    equivalent to changing the prior agent. This can be achieved in this function by choosing the upsampling and
-    downsampling parameters separately.
+        One example is to use one form of downsampling for A and a type of upsampling for B that approximates AT but is
+        not exactly AT.  Another example is to use forward projection from the Radon transform as A and filtered
+        back-projection as B.  In some cases, this improves the final reconstruction.
 
-    Proximal map for upsampled data forward model ~ ||A^T y - x||^2 with A^T block replication
+        Args:
+            data_to_fit: data in a form consistent with the output of A
+            A: linear operator - forward projector
+            AT: linear operator - back projector (see notes above on mismatched back-projection)
+            sigma: estimate of desired step size - small sigma leads to small steps
+            params: parameters used by the cost function
+        """
+        def forward_agent_method(data, x, cost_params):
+            return self.linear_prox_implicit_step(x, data, A, AT, sigma**2)
 
-    Args:
-        data_to_fit: downsampled image data (block mean)
-        agent_input: full-size reconstruction
-        params: params.alpha and params.sigmasq for step size and
-                    params.factor for downsampling factor
+        super().__init__(data_to_fit, forward_agent_method, sigma, params)
+        self.previous_output = None
 
-    Returns:
-        new full-size reconstruction after update
-    """
-    factor = params.factor
-    resample = 0
-    x = agent_input
-    y = data_to_fit
-    ATy = utils.upscale(y, factor, resample)
-    diff = x - ATy
-    scaled_step = (params.alpha / (1 + params.sigmasq)) * diff
-    return x - scaled_step
+    def restart(self):
+        self.previous_output = None
+
+    def linear_prox_implicit_step(self, x, data, A, AT, sigmasq):
+        r"""
+        Instead of solving the proximal map optimization problem as in the ProxAgent, F(x) = v* can be written as an
+        implicit step using
+
+        .. math::
+           v^* = x + \sigma^2 A^T (y - Av^*)
+
+        where y = data. We implement this version using the previous output of v* = F(x), which is saved in an instance variable.
+
+        Args:
+            x: Candidate reconstruction
+            data: Data to fit
+            A: linear operator - forward projector.
+               Assumed to be either an operator or a numpy array that multiplies x.
+            AT: linear operator - back projector (see notes above on mismatched back-projection).
+                Assumed to be either an operator or a numpy array that multiplies Ax.
+            sigmasq: estimate of desired step size - small sigma leads to small steps
+
+        Returns:
+            An approximation of F(x) = v* as defined above.
+        """
+        v = self.previous_output
+        if v is None:
+            # Apply one gradient descent step to initialize v
+            self.previous_output = x
+            self.linear_prox_implicit_step(x, data, A, AT, sigmasq)
+
+        # Check on the type of A and apply it appropriately
+        if callable(A):
+            Av = A(v)
+        else:
+            Av = np.matmul(A, v)
+        # Get the data difference
+        y = data
+        diff = y - Av
+        # Check on the type of AT and apply it appropriately
+        if callable(AT):
+            step = AT(diff)
+        else:
+            step = np.matmul(AT, diff)
+        # Take a step
+        scaled_step = sigmasq * step
+        return x + scaled_step
+
