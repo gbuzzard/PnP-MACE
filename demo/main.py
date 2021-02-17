@@ -34,8 +34,8 @@ if __name__ == '__main__':
 
     # Display
     utils.display_img_console(noisy_image, title="Noisy data")
-    nrmse = utils.nrmse(init_image, ground_truth)
-    title = "Initial reconstruction, nrmse = " + str(nrmse)
+    utils.nrmse = utils.nrmse(init_image, ground_truth)
+    title = "Initial reconstruction, nrmse = " + str(utils.nrmse)
     utils.display_img_console(init_image, title=title)
 
     #########################
@@ -50,12 +50,23 @@ if __name__ == '__main__':
 
     for_agent = forward.ForwardAgent(noisy_image, forward_agent_method, forward_params)
 
+    from scipy.sparse.linalg import eigs, LinearOperator
+
+    base = for_agent.step(0*init_image)
+
+    def mv(vec):
+        img = np.reshape(vec, init_image.shape)
+        mv_prod = for_agent.step(img) - base
+        return np.reshape(mv_prod, vec.shape)
+    vec_len = np.prod(init_image.shape).astype(int)
+    A = LinearOperator((vec_len,vec_len), matvec=mv)
+    w,v = eigs(A, )
     #########################
     # Set up the prior agent
     prior_agent_method = prior.tv1_2d  # prior.bm3d_agent
 
     prior_params = DotMap()
-    prior_params.noise_std = np.sqrt(noise_std)
+    prior_params.noise_std = np.sqrt(noise_var)
 
     prior_agent = prior.PriorAgent(prior_agent_method, prior_params)
 
@@ -70,6 +81,7 @@ if __name__ == '__main__':
     equil_params = DotMap()
     equil_params.mu = mu
     equil_params.rho = rho
+    #equil_params.added_noise_std = 0.01
     equil_params.num_iters = num_iters
     equil_params.keep_all_images = keep_all_images
 

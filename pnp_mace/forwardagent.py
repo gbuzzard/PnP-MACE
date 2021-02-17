@@ -40,53 +40,25 @@ class ForwardAgent(agent.Agent):
 
 
 ######################
-# Prox  agent
-
-class ProxAgent(ForwardAgent):
-    """
-    Class to provide a container and interface to proximal map forward model.
-    """
-
-    def __init__(self, data_to_fit, forward_agent_method, params):
-        """
-        Define the basic elements of the forward agent: the data to fit and the
-        method used to update the input to reflect the data.
-
-        See ForwardAgent for primary documentation.
-
-        This subclass focuses on proximal maps and includes an additional instance variable to keep the output of the
-        output previous update.
-        """
-        super().__init__(data_to_fit, forward_agent_method, params)
-        self.previous_output = None
-
+# Particular forward agent methods
 
 def prox_downsample(data_to_fit, agent_input, params):
-    r"""
+    """
     Proximal map for downsampling forward model ~ ||y - Ax||^2 where A is a downsampling matrix
     The proximal map has the form
 
     .. math::
        F(x) = \mathrm{argmin}_v \;
-        (\alpha /2) \| y - Av \|^2 + (1 / (2\sigma^2)) \| x - v \|^2
+        (1/2) \| y - Av \|^2 + (1 / (2\sigma^2)) \| x - v \|^2
 
-    The solution is
-
-    .. math::
-       F(x) = x + \alpha \sigma^2 A^T(I + \alpha \sigma^2 A A^T)^{-1} (y - Ax)
-
-    For large images, this is not practical unless A A^T is a multiple of the identity matrix, which is true for
-    some important special cases, but not in general.
-
-    Instead of resorting to solving the optimization problem directly, F(x) = v* can be written as an implicit step by
+    This can be shown to be
 
     .. math::
-       v^* = x + \alpha \sigma^2 A^T (y - Av^*)
+       F(x) = x + \sigma^2 A^T(I + \sigma^2 A A^T)^{-1} (y - Ax)
 
-    As in V. Sridhar, X. Wang, G. T. Buzzard and C. A. Bouman, "Distributed Iterative CT Reconstruction Using Multi-Agent
-    Consensus Equilibrium," in IEEE Transactions on Computational Imaging, vol. 6, pp. 1153-1166, 2020,
-    doi: 10.1109/TCI.2020.3008782, we implement this version using the previous output of F(x), which is saved in an
-    instance variable (available through the superclass Agent).
+    As shown in a paper by Emma Reid, et al., replacing the linear map applied to y-Ax in this last expression is
+    equivalent to changing the prior agent. This can be achieved in this function by choosing the upsampling and
+    downsampling parameters separately.
 
     Args:
         data_to_fit:  downsampled image data, assumed to be noise plus A applied to a clean image
@@ -101,29 +73,22 @@ def prox_downsample(data_to_fit, agent_input, params):
         new full-size reconstruction after update
     """
     factor = params.factor
-    downsample = 0
-    if "downsample" in params:
-        downsample = min([params.downsample, 5])
-    upsample = 0
-    if "upsample" in params:
-        upsample = min([params.upsample, 5])
-
+    resample = 0
+    if "resample" in params:
+        resample = min([params.resample, 5])
+    else:
+        resample = 0
     x = agent_input
-    v = self.previous_output
-    cAx = utils.downscale(x, factor, downsample)
+    cAx = utils.downscale(x, factor, resample)
     y = data_to_fit
-    diff = y - cAx
-    unscaled_step = utils.upscale(diff, factor, upsample)
+    diff = cAx - y
+    unscaled_step = utils.upscale(diff, factor, resample)
     scaled_step = (params.alpha / params.sigmasq) * unscaled_step
-    return x + scaled_step
+    return x - scaled_step
 
 
 def prox_fullsize(data_to_fit, agent_input, params):
     """
-    As shown in a paper by Emma Reid, et al., replacing the linear map applied to y-Ax in this last expression is
-    equivalent to changing the prior agent. This can be achieved in this function by choosing the upsampling and
-    downsampling parameters separately.
-
     Proximal map for upsampled data forward model ~ ||A^T y - x||^2 with A^T block replication
 
     Args:
