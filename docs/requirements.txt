@@ -1,0 +1,4 @@
+Sphinx>=3.4
+sphinx_rtd_theme~=0.5.1
+sphinx_autodoc_typehints~=1.11.0
+sphinxcontrib-bibtex~=2.1.4
