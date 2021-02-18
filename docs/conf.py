@@ -142,7 +142,7 @@ html_theme_options = {
     'collapse_navigation': False,
 }
 
-html_logo = '../PnP-MACE-Logo.svg'
+html_logo = '_static/PnP-MACE-Logo.svg'
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = project + 'doc'
