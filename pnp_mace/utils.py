@@ -28,16 +28,30 @@ def load_img(path):
     return local_image
 
 
+def display_image_nrmse(input_image, reference_image, title="", cmap='gray'):
+    """
+    Display an image along with the nrmse relative to the reference image in the title
+
+    Args:
+        input_image: image to be displayed
+        reference_image: reference image for calculating nrmse of input_image
+        title: title for the plot
+        cmap: colormap for image display
+    """
+    title = title + ", NRMSE = " + str(nrmse(input_image, reference_image))
+    display_img_console(input_image, title=title, cmap=cmap)
+
+
 def display_img_console(input_image, title="", cmap='gray'):
     """
     Display an image in console using matplotlib.pyplot
 
     Args:
+        input_image: image to be displayed
         title: title for the plot
         cmap: colormap for image display
-        input_image: image to be displayed
     """
-    plt.imshow(input_image, cmap=cmap)
+    plt.imshow(np.asarray(input_image), vmin=0, vmax=1, cmap=cmap)
     plt.colorbar()
     plt.title(title)
     plt.show()
@@ -105,9 +119,9 @@ def add_noise(clean_image, noise_std, seed=None):
         np.random.seed(seed)
     noise = noise_std * np.random.standard_normal(clean_image.size)
     noise = np.squeeze(noise)
-    noisy_data = np.asarray(clean_image) / 255.0 + noise
+    noisy_data = np.asarray(clean_image) + noise
     noisy_data = np.clip(noisy_data, 0, 1)
-    noisy_image = Image.fromarray(np.round(255.0 * noisy_data).astype(np.int32))
+    noisy_image = Image.fromarray(noisy_data)
     return noisy_image
 
 
