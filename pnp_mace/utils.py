@@ -57,6 +57,21 @@ def display_img_console(input_image, title="", cmap='gray'):
     plt.show()
 
 
+def stack_init_image(init_image, num_images):
+    """
+    Args:
+        init_image: a single image to be copied and stacked
+        num_images: number of copies to be included
+
+    Returns:
+        A list of copies of the original image
+    """
+    init_images = []
+    for j in range(num_images):
+        init_images.append(np.asarray(init_image.copy()))
+
+    return init_images
+
 def downscale(input_image, scale_factor, resample):
     """
     Downscale the image by the given factor in each direction
