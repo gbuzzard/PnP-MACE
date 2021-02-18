@@ -26,32 +26,31 @@ if __name__ == '__main__':
 
     #########################
     # Create noisy data
+    # Note: the BM3D demos have examples to show how to create additive spatially correlated noise
     noise_std = 0.05  # Noise standard deviation
     seed = 0  # seed for pseudorandom noise realization
-
-    # Generate noisy image
-    # Note: the BM3D demos have examples to show how to create additive spatially correlated noise
     noisy_image = utils.add_noise(clean_data, noise_std, seed)
-    init_image = utils.upscale(noisy_image, factor, Image.BICUBIC)  # initial image for PnP
-    init_image = utils.add_noise(init_image, 3*noise_std, seed)
 
-    # Display
+    # Generate initial reconstruction.  This could be all 0s if there's no good initial estimate.
+    init_image = utils.upscale(noisy_image, factor, Image.BICUBIC)  # initial image for PnP
+
+    # Display the initial reconstruction
     utils.display_img_console(noisy_image, title="Noisy data")
-    nrmse = utils.nrmse(init_image, ground_truth)
-    title = "Initial reconstruction, nrmse = " + str(nrmse)
-    utils.display_img_console(init_image, title=title)
+    utils.display_image_nrmse(init_image, ground_truth, title="Initial reconstruction")
 
     #########################
     # Set up the forward agent
     downscale_type = Image.BICUBIC
     upscale_type = Image.BICUBIC
 
+    # We'll use a linear prox map, so we need to define A and AT
     def A(x): return np.asarray(utils.downscale(Image.fromarray(x), factor, downscale_type))
     def AT(x): return np.asarray(utils.upscale(Image.fromarray(x), factor, upscale_type))
 
     step_size = 0.1
     forward_agent = forward.LinearProxForwardAgent(noisy_image, A, AT, step_size)
     one_step_forward = forward_agent.step(np.asarray(init_image))
+    utils.display_image_nrmse(one_step_forward, ground_truth, title="One step of forward model")
 
     #########################
     # Set up the prior agent
@@ -62,6 +61,7 @@ if __name__ == '__main__':
 
     prior_agent = prior.PriorAgent(prior_agent_method, prior_params)
     one_step_prior = prior_agent.step(np.asarray(init_image))
+    utils.display_image_nrmse(one_step_prior, ground_truth, title="One step of prior model")
 
     #########################
     # Set up the equilibrium problem
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     mu = [mu0, 1 - mu0]
     rho = 0.5
     num_iters = 10
-    keep_all_images = True
+    keep_all_images = False
 
     equil_params = DotMap()
     equil_params.mu = mu
@@ -80,77 +80,10 @@ if __name__ == '__main__':
     agents = [forward_agent, prior_agent]
     equil_prob = EquilibriumProblem(agents, mann_iteration_mace, equil_params)
 
-    init_images = []
-    for j in range(len(agents)):
-        init_images.append(np.asarray(init_image.copy()))
+    init_images = utils.stack_init_image(init_image, len(agents))
 
     # Iterate as directed
     final_images, residuals, vectors, all_images = equil_prob.solve(init_images)
     v_sum = mu[0] * vectors[0] + mu[1] * vectors[1]
     i0 = Image.fromarray(final_images[0])
     utils.display_image_nrmse(i0, ground_truth, title="Final reconstruction")
-    a = 0
-    # view_stack = np.moveaxis(all_images, [0, 1, 2], [1,0,2])
-    # np.save("view_stack.npy", view_stack)
-    # residuals = np.array(residuals)
-    # vectors = np.array(vectors)
-    # with napari.gui_qt():
-    #     viewer1 = napari.view_image(noisy_data, rgb=False)
-    #     viewer2 = napari.view_image(v_sum, rgb=False)
-    #     viewer4 = napari.view_image(residuals, rgb=False)
-    #     if keep_all_images:
-    #         viewer4 = napari.view_image(view_stack, rgb=False, order=(2,1,0))
-    #     viewer5 = napari.view_image(vectors, rgb=False)
-
-"""
-    # denoise image (filter using 2D TV-L1, noise level = 0.03)
-    denoiser = ptv.tv1_2d
-    img_denoise = denoiser(ground_truth, 0.03)
-    utils.display_img_console(img_denoise, title="Denoised")
-
-    # utils.downscale image by local averaging
-    factor = 8
-    img_utils.downscaled = utils.downscale(ground_truth, factor)
-    utils.display_img_console(img_utils.downscaled, title="utils.downscaled")
-    print(img_utils.downscaled.shape)
-
-    b = utils.upscale(img_utils.downscaled, factor)
-    utils.display_img_console(b, title="utils.upscaled")
-    # with napari.gui_qt():
-    #     viewer = napari.view_image(b, rgb=False)
-
-
-    # Call BM3D With the default settings.
-    y_est = bm3d(noisy_full_image, psd)
-
-    # To include refiltering:
-    # y_est = bm3d(z, psd, 'refilter')
-
-    # For other settings, use BM3DProfile.
-    # profile = BM3DProfile(); # equivalent to profile = BM3DProfile('np');
-    # profile.gamma = 6;  # redefine value of gamma parameter
-    # y_est = bm3d(z, psd, profile);
-
-    # Note: For white noise, you may instead of the PSD
-    # also pass a standard deviation
-    # y_est = bm3d(z, sqrt(noise_var));
-
-    psnr = get_psnr(noisy_full_image, y_est)
-    print("PSNR:", psnr)
-
-    # PSNR ignoring 16-pixel wide borders (as used in the paper), due to refiltering potentially leaving artifacts
-    # on the pixels near the boundary of the image when noise is not circulant
-    psnr_cropped = get_cropped_psnr(noisy_full_image, y_est, [16, 16])
-    print("PSNR cropped:", psnr_cropped)
-
-    # Ignore values outside range for display (or plt gives an error for multichannel input)
-    y_est = np.minimum(np.maximum(y_est, 0), 1)
-    z_rang = np.minimum(np.maximum(noisy_full_image, 0), 1)
-    plt.title("y, z, y_est")
-    output_image = np.concatenate((noisy_full_image, np.squeeze(z_rang), y_est), axis=1)
-    plt.imshow(output_image, cmap='gray')
-    plt.show()
-
-    with napari.gui_qt():
-        viewer = napari.view_image(output_image, rgb=False)
-"""
