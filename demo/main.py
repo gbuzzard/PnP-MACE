@@ -9,7 +9,9 @@ from PIL import Image
 if __name__ == '__main__':
 
     img_path = "https://www.math.purdue.edu/~buzzard/software/cameraman_clean.jpg"  # original image is loaded to this path
-    ground_truth = utils.load_img(img_path)  # create the image
+    test_image = utils.load_img(img_path)  # create the image
+    image_data = np.asarray(test_image.convert("F")) / 255.0
+    ground_truth = Image.fromarray(image_data)
     utils.display_img_console(ground_truth, title="Original")
 
     #########################
@@ -49,19 +51,21 @@ if __name__ == '__main__':
 
     step_size = 0.1
     forward_agent = forward.LinearProxForwardAgent(noisy_image, A, AT, step_size)
+    one_step_forward = forward_agent.step(np.asarray(init_image))
 
     #########################
     # Set up the prior agent
     prior_agent_method = prior.bm3d_method
 
     prior_params = DotMap()
-    prior_params.noise_std = 0.5
+    prior_params.noise_std = step_size
 
     prior_agent = prior.PriorAgent(prior_agent_method, prior_params)
+    one_step_prior = prior_agent.step(np.asarray(init_image))
 
     #########################
     # Set up the equilibrium problem
-    mu0 = 0.1  # Forward agent weight
+    mu0 = 0.5  # Forward agent weight
     mu = [mu0, 1 - mu0]
     rho = 0.5
     num_iters = 10
@@ -84,8 +88,8 @@ if __name__ == '__main__':
     final_images, residuals, vectors, all_images = equil_prob.solve(init_images)
     v_sum = mu[0] * vectors[0] + mu[1] * vectors[1]
     i0 = Image.fromarray(final_images[0])
-    title = "Final reconstruction, NRMSE = " + str(utils.nrmse(i0, ground_truth))
-    utils.display_img_console(i0, title=title)
+    utils.display_image_nrmse(i0, ground_truth, title="Final reconstruction")
+    a = 0
     # view_stack = np.moveaxis(all_images, [0, 1, 2], [1,0,2])
     # np.save("view_stack.npy", view_stack)
     # residuals = np.array(residuals)
