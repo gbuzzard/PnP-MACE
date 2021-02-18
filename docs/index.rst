@@ -1,4 +1,5 @@
 .. include:: ../README.rst
+  :start-after: docs-include-ref
 
 
 Indices and tables
@@ -26,6 +27,7 @@ Indices and tables
 
    contributing
    authors
+
 
 Credits
 -------

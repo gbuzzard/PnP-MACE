@@ -18,6 +18,10 @@
 
 |
 
+
+.. docs-include-ref
+
+
 This python package includes demonstrations of the PnP algorithm and MACE framework on simple image reconstruction problems.
 
 * Free software: BSD license
