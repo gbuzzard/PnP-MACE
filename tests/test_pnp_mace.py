@@ -5,7 +5,6 @@
 
 import unittest
 
-import pnp_mace as pnpm
 
 
 class TestPnp_mace(unittest.TestCase):
