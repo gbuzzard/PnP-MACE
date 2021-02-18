@@ -17,6 +17,7 @@ Indices and tables
    installation
    usage
    api
+   zreferences
 
 .. toctree::
    :hidden:

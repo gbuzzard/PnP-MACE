@@ -39,10 +39,10 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
-#    "sphinxcontrib.bibtex"
+    "sphinxcontrib.bibtex"
 ]
 
-#bibtex_bibfiles = ["refs.bib"]
+bibtex_bibfiles = ["references.bib"]
 
 
 autosummary_generate = True

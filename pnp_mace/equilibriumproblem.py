@@ -42,7 +42,7 @@ class EquilibriumProblem:
 
 def mann_iteration_mace(init_images, agents, params):
     """
-    Apply Mann iterations in the form x(k+1) = (1 - rho) x(k) + rho (2G - I)(2F - I)(x)
+    Apply Mann iterations in the form x(k+1) = (1 - rho) x(k) + rho (2G - I)(2F - I)(x) :cite:`buzzard-2018-plug`
 
     Args:
         init_images: A list of images to be used as a stacked vector input to the agents
