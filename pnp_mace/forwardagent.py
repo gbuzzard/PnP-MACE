@@ -22,7 +22,7 @@ class ForwardAgent(agent.Agent):
             params: parameters used by the forward agent method
         """
         super().__init__()
-        self.data = data_to_fit
+        self.data = np.asarray(data_to_fit)
         self.method = forward_agent_method
         self.params = params
 
