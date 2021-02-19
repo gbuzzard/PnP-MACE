@@ -9,12 +9,13 @@
     .. image:: https://img.shields.io/pypi/v/pnp_mace.svg
         :target: https://pypi.python.org/pypi/pnp_mace
 
-    .. image:: https://img.shields.io/travis/gbuzzard/pnp_mace.svg
-        :target: https://travis-ci.com/gbuzzard/pnp_mace
 
-    .. image:: https://readthedocs.org/projects/pnp-mace/badge/?version=latest
-        :target: https://pnp-mace.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
+.. image:: https://travis-ci.com/gbuzzard/PnP-MACE.svg?branch=master
+    :target: https://travis-ci.com/gbuzzard/PnP-MACE
+
+.. image:: https://readthedocs.org/projects/pnp-mace/badge/?version=latest
+    :target: https://pnp-mace.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 
 |
 
