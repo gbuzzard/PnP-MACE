@@ -44,7 +44,7 @@ setup(
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/gbuzzard/pnp_mace',
+    url='https://github.com/gbuzzard/PnP-MACE',
     version='0.1.0',
     zip_safe=False,
 )

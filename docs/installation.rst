@@ -32,13 +32,13 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/gbuzzard/pnp_mace
+    $ git clone git://github.com/gbuzzard/PnP-MACE
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl -OJL https://github.com/gbuzzard/pnp_mace/tarball/master
+    $ curl -OJL https://github.com/gbuzzard/PnP-MACE/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/gbuzzard/pnp_mace
-.. _tarball: https://github.com/gbuzzard/pnp_mace/tarball/master
+.. _Github repo: https://github.com/gbuzzard/PnP-MACE
+.. _tarball: https://github.com/gbuzzard/PnP-MACE/tarball/master
