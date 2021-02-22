@@ -90,7 +90,7 @@ class LinearProxForwardAgent(ForwardAgent):
     The solution is
 
     .. math::
-       F(x) = x + \sigma^2 A^T(I + \sigma^2 A A^T)^{-1} (y - Ax)
+       F(x) = x + \sigma^2 (I + \sigma^2 A^T A)^{-1} A^T (y - Ax)
 
     This form is typically not practical unless A A^T is a multiple of the identity matrix, which is true for
     some important special cases, but not in general.
@@ -140,7 +140,7 @@ class LinearProxForwardAgent(ForwardAgent):
         implicit step using
 
         .. math::
-           v^* = x + \sigma^2 A^T (y - Av^*)
+           v^{k+1} = x + \sigma^2 A^T (y - Av^k)
 
         where y = data. We implement this version using the previous output of v* = F(x), which is saved in an instance variable.
 
