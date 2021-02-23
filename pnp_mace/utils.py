@@ -39,10 +39,10 @@ def display_image_nrmse(input_image, reference_image, title="", cmap='gray'):
         cmap: colormap for image display
     """
     title = title + ", NRMSE = " + str(nrmse(input_image, reference_image))
-    display_img_console(input_image, title=title, cmap=cmap)
+    display_image(input_image, title=title, cmap=cmap)
 
 
-def display_img_console(input_image, title="", cmap='gray'):
+def display_image(input_image, title="", cmap='gray'):
     """Display an image in console using :mod:`matplotlib.pyplot`
 
     Args:

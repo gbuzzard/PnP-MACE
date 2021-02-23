@@ -9,7 +9,7 @@ if __name__ == '__main__':
     test_image = pnpm.load_img(img_path)  # create the image
     image_data = np.asarray(test_image.convert("F")) / 255.0
     ground_truth = Image.fromarray(image_data)
-    pnpm.display_img_console(ground_truth, title="Original")
+    pnpm.display_image(ground_truth, title="Original")
 
     #########################
     # Adjust shape as needed to allow for up/down sampling
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     ground_truth = ground_truth.crop((0, 0, new_size[0], new_size[1]))
     resample = Image.NONE # NEAREST = NONE = 0, LANCZOS = 1, BILINEAR = 2, BICUBIC = 3, BOX = 4, HAMMING = 5
     clean_data = pnpm.downscale(ground_truth, factor, resample)
-    pnpm.display_img_console(clean_data, title="Downsampled")
+    pnpm.display_image(clean_data, title="Downsampled")
 
     #########################
     # Create noisy data
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     init_image = pnpm.upscale(noisy_image, factor, Image.BICUBIC)  # initial image for PnP
 
     # Display the initial reconstruction
-    pnpm.display_img_console(noisy_image, title="Noisy data")
+    pnpm.display_image(noisy_image, title="Noisy data")
     pnpm.display_image_nrmse(init_image, ground_truth, title="Initial reconstruction")
 
     #########################
