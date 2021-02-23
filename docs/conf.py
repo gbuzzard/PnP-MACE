@@ -113,7 +113,8 @@ pygments_style = 'sphinx'
 intersphinx_mapping = {
     "https://docs.python.org/3/": None,
     "https://docs.scipy.org/doc/numpy/": None,
-    "https://docs.scipy.org/doc/scipy/reference/": None
+    "https://docs.scipy.org/doc/scipy/reference/": None,
+    'https://matplotlib.org/': None
 }
 
 # -- Options for Napoleon -----------------------------------------------------

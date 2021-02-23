@@ -9,8 +9,8 @@ def load_img(path):
     """Load an image given a filename or url.
 
     Args:
-        path: data path, may be local or url as a string beginning with
-        http.
+        path: data path, may be local, or url as a string beginning with
+           http
 
     Returns:
         Grayscale image
@@ -30,7 +30,7 @@ def load_img(path):
 
 def display_image_nrmse(input_image, reference_image, title="", cmap='gray'):
     """Display an image along with the NRMSE relative to the reference
-       image in the title.
+    image in the title.
 
     Args:
         input_image: image to be displayed
@@ -81,8 +81,8 @@ def downscale(input_image, scale_factor, resample):
         input_image: input image as a numpy array
         scale_factor: upscale factor
         resample: interpolation type as in PIL.Image.py
-                  (NEAREST = NONE = 0, LANCZOS = 1, BILINEAR = 2,
-                   BICUBIC = 3, BOX = 4, HAMMING = 5)
+           (NEAREST = NONE = 0, LANCZOS = 1, BILINEAR = 2,
+           BICUBIC = 3, BOX = 4, HAMMING = 5)
 
     Returns:
         Downscaled image
@@ -98,8 +98,8 @@ def upscale(input_image, scale_factor, resample):
         input_image: input image
         scale_factor: upscale factor
         resample: interpolation type as in PIL.Image.py
-                   (NEAREST = NONE = 0, LANCZOS = 1, BILINEAR = 2,
-                    BICUBIC = 3, BOX = 4, HAMMING = 5)
+           (NEAREST = NONE = 0, LANCZOS = 1, BILINEAR = 2,
+           BICUBIC = 3, BOX = 4, HAMMING = 5)
 
     Returns:
         Upscaled image
