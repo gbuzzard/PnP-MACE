@@ -1,14 +1,15 @@
-# This file contains the class declaration for EquilibriumProblem as well as particular
-# solution methods.
+# -*- coding: utf-8 -*-
+
+"""EquilibriumProblem class and solution methods."""
+
 
 import numpy as np
 import copy
 
 
 class EquilibriumProblem:
-    """
-    Class to provide a container and interface to various equilibrium formulations
-    and solution algorithms.
+    """Class providing a container and interface to various equilibrium
+    formulations and solution algorithms.
     """
 
     def __init__(self, agents, solution_method, params):
@@ -32,9 +33,11 @@ class EquilibriumProblem:
             init_image: Initial image for iterative reconstruction
 
         Returns:
-            DotMap with solution and any information about convergence and residual
+            DotMap with solution and any information about convergence
+            and residual
         """
-        return self.solution_method(init_image, self.agents, self.solution_params)
+        return self.solution_method(init_image, self.agents,
+                                    self.solution_params)
 
 
 ######################
@@ -82,7 +85,7 @@ def mann_iteration_mace(init_images, agents, params):
         temp_images = [2 * temp - cur for temp, cur in zip(temp_images, cur_images)]  # 2F-I
         next_images = G(mu, temp_images, next_images)
         if save_all_images:
-            all_images[:,:,j] = next_images[0]
+            all_images[:, :, j] = next_images[0]
         next_images = [2 * nxt - temp for nxt, temp in zip(next_images, temp_images)]  # 2G-I
         next_images = [(1 - rho) * cur + rho * nxt for cur, nxt in
                        zip(cur_images, next_images)]  # (1-rho) I + rho (2G - I) (2F - I)

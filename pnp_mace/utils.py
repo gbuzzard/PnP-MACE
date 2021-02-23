@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+
+"""Utility functions."""
+
+
 import requests
 from io import BytesIO
 

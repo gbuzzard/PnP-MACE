@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+
+"""Prior agents."""
+
+
 import pnp_mace.agent as agent
 from bm3d import bm3d
 

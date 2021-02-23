@@ -1,9 +1,11 @@
+# -*- coding: utf-8 -*-
+
+"""Forward agents."""
+
+
 import pnp_mace.utils as utils
 import pnp_mace.agent as agent
 import numpy as np
-
-# This file contains the class declaration for ForwardAgent as well as particular
-# forward agent methods.
 
 
 class ForwardAgent(agent.Agent):
