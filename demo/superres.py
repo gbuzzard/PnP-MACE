@@ -1,7 +1,32 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) by Greg Buzzard <buzzard@purdue.edu>
+# All rights reserved.
+
+r"""
+Overview:  A simple demo to demonstrate the solution of a MACE problem using Mann iteration and the
+stacked operators F and G.  The forward model is a subsampling operation, and the prior agent is the
+bm3d denoiser.
+
+First a clean image is subsampled, then white noise is added to produce noisy data.  This is used to
+define a forward agent that updates to better fit the data.
+
+In a classical Bayesian approach, this update has the form :math:`F(x) = x + c A^T (y - Ax)`, for a constant c.
+In some contexts, it's useful to have a mismatched backprojector, which is equivalent to
+replacing :math:`A^T` with an alternative matrix designed to promote better or faster reconstruction.  As
+shown in a paper by Emma Reid, this is equivalent to using the standard back projector but changing the
+prior.
+
+This demo provides the ability to explore mismatched backprojectors by changing the upsampling method
+used to define :math:`A^T`.  It also provides the ability to change the relative weight of data-fitting and denoising
+by changing mu.
+
+"""
+
 from dotmap import DotMap
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
+from skimage.restoration import (denoise_tv_chambolle, denoise_bilateral, denoise_wavelet)
 
 import pnp_mace as pnpm
 
@@ -70,7 +95,18 @@ forward_agent = pnpm.LinearProxForwardAgent(noisy_image, A, AT, step_size)
 """
 Set up the prior agent.
 """
-prior_agent_method = pnpm.bm3d_method
+
+
+# Set the denoiser for the prior agent
+def denoiser(x, params):
+    # denoised_x = denoise_tv_chambolle(x, weight=params.noise_std)
+    # denoised_x = denoise_bilateral(np.clip(x, a_min=0, a_max=None), sigma_spatial=1.5)
+    # denoised_x = denoise_wavelet(x, sigma=0.2)
+    denoised_x = pnpm.bm3d_method(x, params)
+    return denoised_x
+
+
+prior_agent_method = denoiser
 
 prior_params = DotMap()
 prior_params.noise_std = step_size
@@ -104,6 +140,7 @@ equil_params.mu = mu
 equil_params.rho = rho
 equil_params.num_iters = num_iters
 equil_params.keep_all_images = keep_all_images
+equil_params.verbose = True
 
 agents = [forward_agent, prior_agent]
 equil_prob = pnpm.EquilibriumProblem(agents, pnpm.mann_iteration_mace,
@@ -130,4 +167,4 @@ pnpm.display_image_nrmse(i0, ground_truth, title="MACE reconstruction",
 fig.show()
 
 
-input()
+input("Press 'Return' to exit: ")
