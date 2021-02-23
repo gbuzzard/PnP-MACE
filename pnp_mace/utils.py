@@ -1,8 +1,10 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from PIL import Image
 import requests
 from io import BytesIO
+
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from PIL import Image
 
 
 def load_img(path):
@@ -28,7 +30,8 @@ def load_img(path):
     return local_image
 
 
-def display_image_nrmse(input_image, reference_image, title="", cmap='gray'):
+def display_image_nrmse(input_image, reference_image, title="", cmap='gray',
+                        fig=None, ax=None):
     """Display an image along with the NRMSE relative to the reference
     image in the title.
 
@@ -37,23 +40,49 @@ def display_image_nrmse(input_image, reference_image, title="", cmap='gray'):
         reference_image: reference image for calculating nrmse of input_image
         title: title for the plot
         cmap: colormap for image display
+        fig : draw in specified figure instead of creating one
+        ax : plot in specified axes instead of current axes of figure
     """
-    title = title + ", NRMSE = " + str(nrmse(input_image, reference_image))
-    display_image(input_image, title=title, cmap=cmap)
+    title = title + "  [NRMSE: %.3f]" % nrmse(input_image, reference_image)
+    display_image(input_image, title=title, cmap=cmap, fig=fig, ax=ax)
 
 
-def display_image(input_image, title="", cmap='gray'):
+def display_image(input_image, title=None, cmap='gray', fig=None, ax=None):
     """Display an image in console using :mod:`matplotlib.pyplot`
 
     Args:
         input_image: image to be displayed
         title: title for the plot
         cmap: colormap for image display
+        fig : draw in specified figure instead of creating one
+        ax : plot in specified axes instead of current axes of figure
     """
-    plt.imshow(np.asarray(input_image), vmin=0, vmax=1, cmap=cmap)
-    plt.colorbar()
-    plt.title(title)
-    plt.show()
+    figp = fig
+    if fig is None:
+        fig = plt.figure()
+        fig.clf()
+        ax = fig.gca()
+    elif ax is None:
+        ax = fig.gca()
+
+    im = ax.imshow(np.asarray(input_image), vmin=0, vmax=1, cmap=cmap)
+
+    ax.set_yticklabels([])
+    ax.set_xticklabels([])
+
+    if title is not None:
+        ax.set_title(title)
+
+    shape = np.asarray(input_image).shape
+    orient = 'vertical' if shape[0] >= shape[1] else 'horizontal'
+    pos = 'right' if orient == 'vertical' else 'bottom'
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes(pos, size="5%", pad=0.2)
+    plt.colorbar(im, ax=ax, cax=cax, orientation=orient)
+
+
+    if figp is None:
+        fig.show()
 
 
 def stack_init_image(init_image, num_images):
@@ -80,7 +109,7 @@ def downscale(input_image, scale_factor, resample):
     Args:
         input_image: input image as a numpy array
         scale_factor: upscale factor
-        resample: interpolation type as in PIL.Image.py
+        resample: interpolation type as in PIL.Image
            (NEAREST = NONE = 0, LANCZOS = 1, BILINEAR = 2,
            BICUBIC = 3, BOX = 4, HAMMING = 5)
 
@@ -97,7 +126,7 @@ def upscale(input_image, scale_factor, resample):
     Args:
         input_image: input image
         scale_factor: upscale factor
-        resample: interpolation type as in PIL.Image.py
+        resample: interpolation type as in PIL.Image
            (NEAREST = NONE = 0, LANCZOS = 1, BILINEAR = 2,
            BICUBIC = 3, BOX = 4, HAMMING = 5)
 
