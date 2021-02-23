@@ -82,6 +82,12 @@ def mann_iteration_mace(init_images, agents, params):
         all_images = np.zeros(([init_images[0].shape[0],
                                 init_images[0].shape[1], num_iters]))
 
+    if ("verbose" in params) and params.verbose:
+        print_output = True
+        print("Starting Mann iterations")
+    else:
+        print_output = False
+
     # Apply Mann iterations
     for j in range(num_iters):
         if added_noise_std > 0:
@@ -101,6 +107,8 @@ def mann_iteration_mace(init_images, agents, params):
         next_images = [(1 - rho) * cur + rho * nxt for cur, nxt in
                        zip(cur_images, next_images)]
         cur_images = copy.deepcopy(next_images)
+        if print_output:
+            print("Finished iteration " + str(j+1) + " of " + str(num_iters))
 
     # Calculate the residuals and vectors
     next_images = G(mu, cur_images, next_images)
