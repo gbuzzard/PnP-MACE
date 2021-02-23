@@ -85,7 +85,6 @@ def display_image(input_image, title=None, cmap='gray', fig=None, ax=None):
     cax = divider.append_axes(pos, size="5%", pad=0.2)
     plt.colorbar(im, ax=ax, cax=cax, orientation=orient)
 
-
     if figp is None:
         fig.show()
 

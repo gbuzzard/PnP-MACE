@@ -18,13 +18,13 @@ from bm3d import bm3d
 
 class PriorAgent(agent.Agent):
     """
-    Class to provide a container and interface to various prior models.
+    Class providing a container and interface to various prior models.
     """
 
     def __init__(self, prior_agent_method, params):
         """
-        Define the basic elements of the prior agent: the data to fit and the method
-        used to update the input to reflect the data.
+        Define the basic elements of the prior agent: the data to fit
+        and the method used to update the input to reflect the data.
 
         Args:
             prior_agent_method: method to update input to reflect data
@@ -46,7 +46,7 @@ class PriorAgent(agent.Agent):
         """
         return self.method(agent_input, self.params)
 
-######################
+
 # Particular prior agent methods
 
 
