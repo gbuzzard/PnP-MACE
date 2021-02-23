@@ -41,7 +41,8 @@ Display test images.
 fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(9, 9))
 pnpm.display_image(ground_truth, title="Original", fig=fig, ax=ax[0, 0])
 pnpm.display_image(clean_data, title="Downsampled", fig=fig, ax=ax[0, 1])
-pnpm.display_image(noisy_image, title="Noisy downsampled", fig=fig, ax=ax[1, 0])
+pnpm.display_image(noisy_image, title="Noisy downsampled", fig=fig,
+                   ax=ax[1, 0])
 pnpm.display_image_nrmse(init_image, ground_truth,
                          title="Bicubic reconstruction", fig=fig, ax=ax[1, 1])
 fig.show()
@@ -53,11 +54,15 @@ define A and AT.
 downscale_type = Image.BICUBIC
 upscale_type = Image.BICUBIC
 
+
 def A(x):
     return np.asarray(pnpm.downscale(Image.fromarray(x), factor,
                                      downscale_type))
+
+
 def AT(x):
     return np.asarray(pnpm.upscale(Image.fromarray(x), factor, upscale_type))
+
 
 step_size = 0.1
 forward_agent = pnpm.LinearProxForwardAgent(noisy_image, A, AT, step_size)
