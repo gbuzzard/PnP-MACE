@@ -1,14 +1,15 @@
-# This file contains the class declaration for EquilibriumProblem as well as particular
-# solution methods.
+# -*- coding: utf-8 -*-
+
+"""EquilibriumProblem class and solution methods."""
+
 
 import numpy as np
 import copy
 
 
 class EquilibriumProblem:
-    """
-    Class to provide a container and interface to various equilibrium formulations
-    and solution algorithms.
+    """Class providing a container and interface to various equilibrium
+    formulations and solution algorithms.
     """
 
     def __init__(self, agents, solution_method, params):
@@ -18,7 +19,7 @@ class EquilibriumProblem:
         Args:
             agents: list of forward and prior agents
             solution_method: callable method to find a solution
-            params: arameters used by the solution method
+            params: parameters used by the solution method
         """
         self.agents = agents
         self.solution_method = solution_method
@@ -32,24 +33,30 @@ class EquilibriumProblem:
             init_image: Initial image for iterative reconstruction
 
         Returns:
-            DotMap with solution and any information about convergence and residual
+            DotMap with solution and any information about convergence
+            and residual
         """
-        return self.solution_method(init_image, self.agents, self.solution_params)
+        return self.solution_method(init_image, self.agents,
+                                    self.solution_params)
 
 
-######################
-# Particular solution methods
+# Particular solution methods below
 
 def mann_iteration_mace(init_images, agents, params):
-    """
-    Apply Mann iterations in the form x(k+1) = (1 - rho) x(k) + rho (2G - I)(2F - I)(x) :cite:`buzzard-2018-plug`
+    r"""Apply Mann iterations.
+
+    Apply Mann iterations of the form :math:`x(k+1) = (1 - \rho) x(k) +
+    \rho (2G - I)(2F - I)(x)` :cite:`buzzard-2018-plug`
 
     Args:
-        init_images: A list of images to be used as a stacked vector input to the agents
+        init_images: A list of images to be used as a stacked vector
+           input to the agents
         agents: A list of agents, both forward and prior
-        params: params.mu gives weighting of agents (should be positive adding to 1),
-                   params.rho gives Mann parameter, params.num_iters gives number of iterations,
-                   params.added_noise_std gives the noise level added to each iteration for generative MACE
+        params: `params.mu` gives weighting of agents (should be positive
+           adding to 1), `params.rho` gives Mann parameter,
+           `params.num_iters` gives number of iterations,
+           `params.added_noise_std` gives the noise level added to each
+           iteration for generative MACE
 
     Returns:
         A list of output images after num_iters
@@ -72,20 +79,27 @@ def mann_iteration_mace(init_images, agents, params):
     all_images = []
     if ("keep_all_images" in params) and params.keep_all_images:
         save_all_images = True
-        all_images = np.zeros(([init_images[0].shape[0], init_images[0].shape[1], num_iters]))
+        all_images = np.zeros(([init_images[0].shape[0],
+                                init_images[0].shape[1], num_iters]))
 
     # Apply Mann iterations
     for j in range(num_iters):
         if added_noise_std > 0:
-            cur_images = [cur + added_noise_std*np.random.randn(cur.shape[0], cur.shape[1]) for cur in cur_images]
+            cur_images = [cur + added_noise_std*np.random.randn(
+                cur.shape[0], cur.shape[1]) for cur in cur_images]
         temp_images = F(agents, cur_images)
-        temp_images = [2 * temp - cur for temp, cur in zip(temp_images, cur_images)]  # 2F-I
+        # 2F-I
+        temp_images = [2 * temp - cur for temp, cur in zip(
+            temp_images, cur_images)]
         next_images = G(mu, temp_images, next_images)
         if save_all_images:
-            all_images[:,:,j] = next_images[0]
-        next_images = [2 * nxt - temp for nxt, temp in zip(next_images, temp_images)]  # 2G-I
+            all_images[:, :, j] = next_images[0]
+        # 2G-I
+        next_images = [2 * nxt - temp for nxt, temp in zip(
+            next_images, temp_images)]
+        # (1-rho) I + rho (2G - I) (2F - I)
         next_images = [(1 - rho) * cur + rho * nxt for cur, nxt in
-                       zip(cur_images, next_images)]  # (1-rho) I + rho (2G - I) (2F - I)
+                       zip(cur_images, next_images)]
         cur_images = copy.deepcopy(next_images)
 
     # Calculate the residuals and vectors
@@ -97,9 +111,10 @@ def mann_iteration_mace(init_images, agents, params):
 
 
 def F(agents, images_in):
-    """
-    The stacked agent map.  Takes a list of agents and a list of images
-    and applies each agent to the corresponding image.
+    """The stacked agent map.
+
+    Takes a list of agents and a list of images and applies each agent
+    to the corresponding image.
 
     Args:
         agents: List of agents
@@ -113,14 +128,16 @@ def F(agents, images_in):
 
 
 def G(mu, images_in, images_out):
-    """
-    The stacked averaging map.  Takes a list of images, applies a weighted average, and
-    redistributes them in a list.
+    """The stacked averaging map.
+
+    Takes a list of images, applies a weighted average, and redistributes
+    them in a list.
 
     Args:
         mu: Weights for the average
         images_in: List of input images
-        images_out: List of output images (used to provide memory for the output)
+        images_out: List of output images (used to provide memory for
+           the output)
 
     Returns:
         Averaged input images, copied into the list images_out
