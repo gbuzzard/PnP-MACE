@@ -20,9 +20,9 @@ script: tox
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel
-  user: gbuzzard
+  username: __token__
   password:
-    secure: PLEASE_REPLACE_ME
+    secure: tVDKXpPxq4q/5Sp+f3z3E3DN5UUgGf/06g8iJPV1fohzBXnxKNglv69oe8nY/AaIPlAWSgQR1w5qx9xLpDX+s1ArK+8yoAJ3vo7J7H8kClJQxOsAw9qOcIsetSycKF6p2MFeQnFMtSz8SHsTWXgU9AMxD3uJc8+z0YM9IBCIMrdSJ+PHFcRYDYQwSUxJkZXpED0d5m0CYCOV/RQIj9A2WBugJ2ODB6MvP031WAcJ4DSVM6SWsK5h47I1KXwpUO9Tzo8SyvTV9rqn52WqFSel9JXJfJrUedgKWT3nNA5Hs3HvCABiwFvbC4IjgCIsOwEfWry/0JHcnEqD9vyTGYKsDDXHmYpV5atwr9UwSzOm6Iij45yrgrxeal6UIc20sJ0NkUC4/dUDb6bI7uHhrsZmqSr2NIVDrw5U0JctCtP/H1z/2zKVRgKtl+CB8bdAZwWZeZHY//a1eMs/8gGVgwVZxJUqyw2i3qHa+wFlZhpIn5tJ/tonjKNvUqRNJETC5+8qljnyHew3uQMgN79H7GAi+gS94lBNmOLcBduUdAeSI0HwmVvpuYpQZaf5olY4TcueeTZEzj2Kuj8MSe9W9HkXMKRkDPccR/jsnyxCWHf6vk23lBqeEdNuwKirxzMbuH8QM6IcO075QBzemAQ2lbTMoH//Yfd+qLhjbw1ZiPWvXLI=
   on:
     tags: true
     repo: gbuzzard/PnP-MACE
