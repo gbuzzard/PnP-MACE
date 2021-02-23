@@ -6,11 +6,11 @@ from io import BytesIO
 
 
 def load_img(path):
-    """
-    Given the image path, return the image.
+    """Load an image given a filename or url.
 
     Args:
-        path: data path, may be local or url as a string beginning with http.
+        path: data path, may be local or url as a string beginning with
+        http.
 
     Returns:
         Grayscale image
@@ -29,8 +29,8 @@ def load_img(path):
 
 
 def display_image_nrmse(input_image, reference_image, title="", cmap='gray'):
-    """
-    Display an image along with the nrmse relative to the reference image in the title
+    """Display an image along with the NRMSE relative to the reference
+       image in the title.
 
     Args:
         input_image: image to be displayed
@@ -43,8 +43,7 @@ def display_image_nrmse(input_image, reference_image, title="", cmap='gray'):
 
 
 def display_img_console(input_image, title="", cmap='gray'):
-    """
-    Display an image in console using matplotlib.pyplot
+    """Display an image in console using :mod:`matplotlib.pyplot`
 
     Args:
         input_image: image to be displayed
@@ -58,7 +57,8 @@ def display_img_console(input_image, title="", cmap='gray'):
 
 
 def stack_init_image(init_image, num_images):
-    """
+    """Create a list from a single image.
+
     Args:
         init_image: a single image to be copied and stacked
         num_images: number of copies to be included
@@ -72,16 +72,17 @@ def stack_init_image(init_image, num_images):
 
     return init_images
 
+
 def downscale(input_image, scale_factor, resample):
-    """
-    Downscale the image by the given factor in each direction
-    using replication
+    """Downscale the image via decimation by the given factor in each
+    direction.
 
     Args:
         input_image: input image as a numpy array
         scale_factor: upscale factor
         resample: interpolation type as in PIL.Image.py
-                    NEAREST = NONE = 0, LANCZOS = 1, BILINEAR = 2, BICUBIC = 3, BOX = 4, HAMMING = 5
+                  (NEAREST = NONE = 0, LANCZOS = 1, BILINEAR = 2,
+                   BICUBIC = 3, BOX = 4, HAMMING = 5)
 
     Returns:
         Downscaled image
@@ -90,38 +91,43 @@ def downscale(input_image, scale_factor, resample):
 
 
 def upscale(input_image, scale_factor, resample):
-    """
-    Upscale the image by the given factor in each direction
-    using replication
+    """Upscale the image via replication by the given factor in each
+    direction.
 
     Args:
         input_image: input image
         scale_factor: upscale factor
         resample: interpolation type as in PIL.Image.py
-                    NEAREST = NONE = 0, LANCZOS = 1, BILINEAR = 2, BICUBIC = 3, BOX = 4, HAMMING = 5
+                   (NEAREST = NONE = 0, LANCZOS = 1, BILINEAR = 2,
+                    BICUBIC = 3, BOX = 4, HAMMING = 5)
 
     Returns:
         Upscaled image
     """
     new_img = input_image.copy()
-    return new_img.resize(np.round(scale_factor * np.array(input_image.size)).astype(np.int), resample)
+    size = np.round(scale_factor * np.array(input_image.size)).astype(np.int)
+    return new_img.resize(size, resample)
 
 
 def nrmse(image, reference):
-    """
+    """Calculate the NRMSE of an image with respect to a reference.
+
     Args:
         image: input image to be compared with reference
         reference: reference image
 
     Returns:
-        Root mean square error of the difference of image and reference, divided by the root mean square of the reference
+        Root mean square error of the difference of image and reference,
+        divided by the root mean square of the reference
     """
-    nrmse = np.sqrt(np.mean((np.asarray(image) - np.asarray(reference)) ** 2)) / np.sqrt(np.mean(np.asarray(reference)**2))
+    nrmse = (np.sqrt(np.mean((np.asarray(image) - np.asarray(reference))**2)) /
+             np.sqrt(np.mean(np.asarray(reference)**2)))
     return np.round(nrmse, decimals=3)
 
 
 def add_noise(clean_image, noise_std, seed=None):
-    """
+    """Add Gaussian white noise to an image.
+
     Args:
         clean_image: input image
         noise_std: standard deviation of noise to be added
@@ -138,25 +144,3 @@ def add_noise(clean_image, noise_std, seed=None):
     noisy_data = np.clip(noisy_data, 0, 1)
     noisy_image = Image.fromarray(noisy_data)
     return noisy_image
-
-
-def prox_approximation(x, data, cost_function, sigma, cost_params):
-    r"""
-        Return an approximate solution to
-
-        .. math::
-           F(x) = \mathrm{argmin}_v \; f(v, data, params) + (1 / (2\sigma^2)) \| x - v \|^2
-
-        Args:
-            x: Candidate reconstruction
-            data: Data to fit or None for a prior cost function
-            cost_function: function that accepts (v, data, params), where v is a candidate reconstruction and
-                           data is the data to be fit, and returns a cost
-            sigma: estimate of desired step size - small sigma leads to small steps
-            cost_params: parameters used by the cost function
-
-        Returns:
-            An approximation of F(x) as defined above.
-    """
-    # TODO:  implement using sporco
-    pass
