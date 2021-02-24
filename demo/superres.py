@@ -33,19 +33,19 @@ import pnp_mace as pnpm
 """
 Load test image.
 """
+print("Reading image and creating noisy, subsampled data.")
 img_path = "https://www.math.purdue.edu/~buzzard/software/cameraman_clean.jpg"
 test_image = pnpm.load_img(img_path)  # create the image
-image_data = np.asarray(test_image.convert("F")) / 255.0
-ground_truth = Image.fromarray(image_data)
 
 """
-Adjust ground truth image shape as needed to allow for up/down sampling.
+Adjust image shape as needed to allow for up/down sampling.
 """
 factor = 4  # Downsampling factor
-new_size = factor * np.floor(ground_truth.size / np.double(factor))
+new_size = factor * np.floor(test_image.shape / np.double(factor))
 new_size = new_size.astype(int)
-ground_truth = ground_truth.crop((0, 0, new_size[0], new_size[1]))
+resized_image = Image.fromarray(test_image).crop((0, 0, new_size[0], new_size[1]))
 resample = Image.NONE
+ground_truth = np.asarray(resized_image).astype(float) / 255.0
 clean_data = pnpm.downscale(ground_truth, factor, resample)
 
 """
@@ -76,17 +76,17 @@ fig.show()
 Set up the forward agent. We'll use a linear prox map, so we need to
 define A and AT.
 """
+print("Setting up the agents and equilibrium problem.")
 downscale_type = Image.BICUBIC
 upscale_type = Image.BICUBIC
 
 
 def A(x):
-    return np.asarray(pnpm.downscale(Image.fromarray(x), factor,
-                                     downscale_type))
+    return pnpm.downscale(x, factor, downscale_type)
 
 
 def AT(x):
-    return np.asarray(pnpm.upscale(Image.fromarray(x), factor, upscale_type))
+    return pnpm.upscale(x, factor, upscale_type)
 
 
 step_size = 0.1
@@ -116,6 +116,7 @@ prior_agent = pnpm.PriorAgent(prior_agent_method, prior_params)
 """
 Compute and display one step of forward and prior agents.
 """
+print("Applying one step of each of the forward and prior agents for illustration.")
 one_step_forward = forward_agent.step(np.asarray(init_image))
 one_step_prior = prior_agent.step(np.asarray(init_image))
 
@@ -151,6 +152,7 @@ init_images = pnpm.stack_init_image(init_image, len(agents))
 """
 Compute MACE iterations.
 """
+print("Computing the solution.")
 final_images, residuals, vectors, all_images = equil_prob.solve(init_images)
 v_sum = mu[0] * vectors[0] + mu[1] * vectors[1]
 i0 = Image.fromarray(final_images[0])
