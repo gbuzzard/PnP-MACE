@@ -42,50 +42,13 @@ class ForwardAgent(agent.Agent):
 
 # Proximal map forward  agent
 
-class ProxForwardAgent(ForwardAgent):
-    """Class providing a container and interface to proximal map forward
-    model.
-    """
-
-    def __init__(self, data_to_fit, cost_function, sigma, params):
-        r"""
-        Define the basic elements of the proximal map forward agent: the
-        data to fit and the cost function used to promote data fitting.
-
-        This subclass focuses on proximal maps.  The cost function
-        should have the form f(x, data, params), where x is a
-        candidate reconstruction and data is the data to fit.
-
-        The implementation approximates a solution to
-
-        .. math::
-           F(x) = \mathrm{argmin}_v \; f(v, data, params) + (1 /
-           (2\sigma^2)) \| x - v \|^2
-
-        Args:
-            data_to_fit: data in a form used by forward_agent_method
-            cost_function: function that accepts (v, data, params),
-                where v is a candidate reconstruction and data is the
-                data to be fit, and returns a cost
-            sigma: estimate of desired step size - small sigma leads to
-                small steps
-            params: parameters used by the cost function
-        """
-        def forward_agent_method(data, x, cost_params):
-            return utils.prox_approximation(x, data, cost_function, sigma,
-                                            cost_params)
-
-        super().__init__(data_to_fit, forward_agent_method, params)
-        self.previous_output = None
-
-
 class LinearProxForwardAgent(ForwardAgent):
     r"""
-    Class to provide a container and interface to a proximal map forward
+    Class providing a container and interface to a proximal map forward
     model for a cost function of the form
 
     .. math::
-       f(x) = (1/2) \| y - Av \|^2
+       f(x) = (1/2) \| y - Av \|_2^2
 
     The associated proximal map has the form
 
