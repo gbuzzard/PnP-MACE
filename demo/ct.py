@@ -341,20 +341,18 @@ def display_images(image_list, image_titles, ground_truth):
     num_scales = len(vmin)
 
     for img, title in zip(image_list, titles):
-        plt.figure(figsize=(20, 8))
-        plt.clf()
+
+        fig, ax = plt.subplots(nrows=1, ncols=num_scales, figsize=(4.5*num_scales, 5))
 
         for k in range(num_scales):
             # display at various scales
-            ax = plt.subplot(1, num_scales, k + 1)
-            plt.imshow(img, vmin=vmin[k], vmax=vmax[k])
-            plt.colorbar()
-            ax.get_xaxis().set_visible(False)
-            ax.get_yaxis().set_visible(False)
+            range_title = "Range: " + str(vmin[k]) + " to " + str(vmax[k])
+            pnpm.display_image(img, title=range_title, fig=fig, ax=ax[k], vmin=vmin[k], vmax=vmax[k], cmap="viridis")
+            #plt.colorbar()
 
         plt.suptitle(title)
         plt.tight_layout()
-        plt.show()
+        fig.show()
 
 
 if __name__ == '__main__':
