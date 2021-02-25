@@ -3,7 +3,6 @@
 """Forward agents."""
 
 
-import pnp_mace.utils as utils
 import pnp_mace.agent as agent
 import numpy as np
 
