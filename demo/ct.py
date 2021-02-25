@@ -24,7 +24,7 @@ def ct_demo():
     filtered or unfiltered backprojection, and the prior agent is the bm3d denoiser.
     """
 
-    # Set basic paramgers
+    # Set basic parameters
     img_path = "https://www.math.purdue.edu/~buzzard/software/image01.png"
     num_views = 60
     mu0 = 0.6  # Forward agent weight
@@ -137,7 +137,7 @@ def ct_demo():
 def get_image_and_mask(image_path, imsize=None):
     r"""
 
-    The images are assumed to mimic single-energy (~100 KeV) CT images with high dynamic range.
+    The images in this demo are designed to mimic single-energy (~100 KeV) CT images with high dynamic range.
     The pixel values are in Hounsfield units, with air as 0 and water as 1000. Hounsfield units are closely
     related to the atomic weight of the associated material. We then scale so that water is 1 and air is 0.
     In these scaled units, steel and other dense metals are about 12 to 15, but may go up to 20.
