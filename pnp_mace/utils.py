@@ -20,7 +20,7 @@ def load_img(path):
            http
 
     Returns:
-        Grayscale image
+        Grayscale image (numpy ndarray)
     """
 
     if path[0:4] == "http":
@@ -32,7 +32,7 @@ def load_img(path):
     local_image = local_image.convert('L')
     local_image = local_image.convert('F')
 
-    return local_image
+    return np.asarray(local_image)
 
 
 def display_image_nrmse(input_image, reference_image, title="", cmap='gray',
@@ -52,7 +52,7 @@ def display_image_nrmse(input_image, reference_image, title="", cmap='gray',
     display_image(input_image, title=title, cmap=cmap, fig=fig, ax=ax)
 
 
-def display_image(input_image, title=None, cmap='gray', fig=None, ax=None):
+def display_image(input_image, title=None, vmin=0, vmax=1, cmap='gray', fig=None, ax=None):
     """Display an image in console using :mod:`matplotlib.pyplot`
 
     Args:
@@ -70,7 +70,7 @@ def display_image(input_image, title=None, cmap='gray', fig=None, ax=None):
     elif ax is None:
         ax = fig.gca()
 
-    im = ax.imshow(np.asarray(input_image), vmin=0, vmax=1, cmap=cmap)
+    im = ax.imshow(np.asarray(input_image), vmin=vmin, vmax=vmax, cmap=cmap)
 
     ax.set_yticklabels([])
     ax.set_xticklabels([])
@@ -97,7 +97,7 @@ def stack_init_image(init_image, num_images):
         num_images: number of copies to be included
 
     Returns:
-        A list of copies of the original image
+        A list of copies of the original image  (numpy ndarrays)
     """
     init_images = []
     for j in range(num_images):
@@ -118,9 +118,10 @@ def downscale(input_image, scale_factor, resample):
            BICUBIC = 3, BOX = 4, HAMMING = 5)
 
     Returns:
-        Downscaled image
+        Downscaled image (numpy ndarray)
     """
-    return upscale(input_image, 1/scale_factor, resample)
+    new_image = upscale(input_image, 1/scale_factor, resample)
+    return np.asarray(new_image)
 
 
 def upscale(input_image, scale_factor, resample):
@@ -135,11 +136,11 @@ def upscale(input_image, scale_factor, resample):
            BICUBIC = 3, BOX = 4, HAMMING = 5)
 
     Returns:
-        Upscaled image
+        Upscaled image (numpy ndarray)
     """
-    new_img = input_image.copy()
-    size = np.round(scale_factor * np.array(input_image.size)).astype(np.int)
-    return new_img.resize(size, resample)
+    new_img = Image.fromarray(input_image)
+    size = np.round(scale_factor * np.array(new_img.size)).astype(int)
+    return np.asarray(new_img.resize(size, resample))
 
 
 def nrmse(image, reference):
@@ -167,13 +168,12 @@ def add_noise(clean_image, noise_std, seed=None):
         seed: seed for random number generator
 
     Returns:
-        image with noise added, clipped to valid range of values
+        image with noise added, clipped to valid range of values (numpy ndarray)
     """
     if seed is not None:
         np.random.seed(seed)
-    noise = noise_std * np.random.standard_normal(clean_image.size)
+    noise = noise_std * np.random.standard_normal(np.asarray(clean_image).shape)
     noise = np.squeeze(noise)
     noisy_data = np.asarray(clean_image) + noise
-    noisy_data = np.clip(noisy_data, 0, 1)
-    noisy_image = Image.fromarray(noisy_data)
+    noisy_image = np.clip(noisy_data, 0, 1)
     return noisy_image
