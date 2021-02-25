@@ -63,7 +63,7 @@ __ https://engineering.purdue.edu/~bouman/publications/orig-pdf/SIIMS01.pdf
 
 * `Demo code illustrating reconstruction with image subsampling and tomography`_.
 
-.. _`Demo code illustrating reconstruction with image subsampling and tomography`: https://github.com/gbuzzard/PnP-MACE/tree/master/demo
+.. _`Demo code illustrating reconstruction with image subsampling and tomography`: https://pnp-mace.readthedocs.io/en/latest/demos.html
 
 This is free software with a `BSD license`_.
 
