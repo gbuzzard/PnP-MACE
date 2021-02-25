@@ -54,12 +54,12 @@ Create noisy downsampled image.
 """
 noise_std = 0.05  # Noise standard deviation
 seed = 0          # Seed for pseudorandom noise realization
-noisy_image = pnpm.add_noise(clean_data, noise_std, seed)
+noisy_data = pnpm.add_noise(clean_data, noise_std, seed)
 
 """
 Generate initial solution for MACE.
 """
-init_image = pnpm.upscale(noisy_image, factor, Image.BICUBIC)
+init_image = pnpm.upscale(noisy_data, factor, Image.BICUBIC)
 
 """
 Display test images.
@@ -67,7 +67,7 @@ Display test images.
 fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(9, 9))
 pnpm.display_image(ground_truth, title="Original", fig=fig, ax=ax[0, 0])
 pnpm.display_image(clean_data, title="Downsampled", fig=fig, ax=ax[0, 1])
-pnpm.display_image(noisy_image, title="Noisy downsampled", fig=fig,
+pnpm.display_image(noisy_data, title="Noisy downsampled", fig=fig,
                    ax=ax[1, 0])
 pnpm.display_image_nrmse(init_image, ground_truth,
                          title="Bicubic reconstruction", fig=fig, ax=ax[1, 1])
@@ -91,7 +91,7 @@ def AT(x):
 
 
 step_size = 0.1
-forward_agent = pnpm.LinearProxForwardAgent(noisy_image, A, AT, step_size)
+forward_agent = pnpm.LinearProxForwardAgent(noisy_data, A, AT, step_size)
 
 """
 Set up the prior agent.
