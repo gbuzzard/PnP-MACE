@@ -2,16 +2,27 @@
 
 """The setup script."""
 
+import os
+from ast import parse
 from setuptools import setup, find_packages
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
-requirements = [ ]
+name = 'pnp_mace'
 
-setup_requirements = [ ]
+# See http://stackoverflow.com/questions/2058802
+with open(os.path.join(name, '__init__.py')) as f:
+    version = parse(next(filter(
+        lambda line: line.startswith('__version__'),
+        f))).body[0].value.s
 
-test_requirements = [ ]
+
+requirements = ['numpy', 'matplotlib', 'requests', 'dotmap', 'Pillow', 'bm3d']
+
+setup_requirements = []
+
+test_requirements = ['pytest', 'pytest-runner']
 
 setup(
     author="Gregery T. Buzzard",
@@ -20,6 +31,8 @@ setup(
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
+        'Intended Audience :: Education',
+        'Intended Audience :: Science/Research',
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
@@ -29,22 +42,17 @@ setup(
         'Programming Language :: Python :: 3.8',
     ],
     description="Demonstrations of the PnP algorithm and MACE framework on simple image reconstruction problems. ",
-    entry_points={
-        'console_scripts': [
-            'pnp_mace=pnp_mace.cli:main',
-        ],
-    },
     install_requires=requirements,
     license="BSD license",
     long_description=readme + '\n\n',
     include_package_data=True,
     keywords='pnp_mace',
-    name='pnp_mace',
+    name=name,
     packages=find_packages(include=['pnp_mace', 'pnp_mace.*']),
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/gbuzzard/PnP-MACE',
-    version='0.1.0',
+    version=version,
     zip_safe=False,
 )
