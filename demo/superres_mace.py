@@ -3,30 +3,35 @@
 # All rights reserved.
 
 r"""
-Overview:  A simple demo to demonstrate the solution of a MACE problem using Mann iteration and the
-stacked operators F and G.  The forward model is a subsampling operation, and the prior agent is the
-bm3d denoiser.
+Overview: A simple demo to demonstrate the solution of a MACE problem
+using Mann iteration and the stacked operators F and G.  The forward
+model is a subsampling operation, and the prior agent is the bm3d
+denoiser.
 
-First a clean image is subsampled, then white noise is added to produce noisy data.  This is used to
-define a forward agent that updates to better fit the data.
+First a clean image is subsampled, then white noise is added to
+produce noisy data.  This is used to define a forward agent that
+updates to better fit the data.
 
-In a classical Bayesian approach, this update has the form :math:`F(x) = x + c A^T (y - Ax)`, for a constant c.
-In some contexts, it's useful to have a mismatched backprojector, which is equivalent to
-replacing :math:`A^T` with an alternative matrix designed to promote better or faster reconstruction.  As
-shown in a paper by Emma Reid, this is equivalent to using the standard back projector but changing the
-prior.
+In a classical Bayesian approach, this update has the form :math:`F(x)
+= x + c A^T (y - Ax)`, for a constant c.  In some contexts, it's
+useful to have a mismatched backprojector, which is equivalent to
+replacing :math:`A^T` with an alternative matrix designed to promote
+better or faster reconstruction.  As shown in a paper by Emma Reid,
+this is equivalent to using the standard back projector but changing
+the prior.
 
-This demo provides the ability to explore mismatched backprojectors by changing the upsampling method
-used to define :math:`A^T`.  It also provides the ability to change the relative weight of data-fitting and denoising
-by changing mu.
-
+This demo provides the ability to explore mismatched backprojectors by
+changing the upsampling method used to define :math:`A^T`.  It also
+provides the ability to change the relative weight of data-fitting and
+denoising by changing mu.
 """
 
 from dotmap import DotMap
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
-from skimage.restoration import (denoise_tv_chambolle, denoise_bilateral, denoise_wavelet)
+from skimage.restoration import (denoise_tv_chambolle, denoise_bilateral,
+                                 denoise_wavelet)
 
 import pnp_mace as pnpm
 
@@ -43,7 +48,8 @@ Adjust image shape as needed to allow for up/down sampling.
 factor = 4  # Downsampling factor
 new_size = factor * np.floor(test_image.shape / np.double(factor))
 new_size = new_size.astype(int)
-resized_image = Image.fromarray(test_image).crop((0, 0, new_size[0], new_size[1]))
+resized_image = Image.fromarray(test_image).crop((0, 0, new_size[0],
+                                                  new_size[1]))
 resample = Image.NONE
 ground_truth = np.asarray(resized_image).astype(float) / 255.0
 clean_data = pnpm.downscale(ground_truth, factor, resample)
@@ -96,7 +102,6 @@ forward_agent = pnpm.LinearProxForwardAgent(noisy_image, A, AT, step_size)
 Set up the prior agent.
 """
 
-
 # Set the denoiser for the prior agent
 def denoiser(x, params):
     # denoised_x = denoise_tv_chambolle(x, weight=params.noise_std)
@@ -116,7 +121,8 @@ prior_agent = pnpm.PriorAgent(prior_agent_method, prior_params)
 """
 Compute and display one step of forward and prior agents.
 """
-print("Applying one step of each of the forward and prior agents for illustration.")
+print("Applying one step of each of the forward and prior agents for "
+      "illustration.")
 one_step_forward = forward_agent.step(np.asarray(init_image))
 one_step_prior = prior_agent.step(np.asarray(init_image))
 
