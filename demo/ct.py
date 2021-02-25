@@ -16,12 +16,15 @@ from dotmap import DotMap
 
 def ct_demo():
     r"""
-    Overview: This demo illustrates a 2D tomography example using a high-dynamic range phantom.
-    First the radon transform is applied using relatively spare views.  Then proportional noise is added and filtered
-    backprojection applied to produce an initial reconstruction.
+    Overview: This demo illustrates a 2D tomography example using a
+    high-dynamic range phantom.  First the radon transform is applied
+    using relatively spare views.  Then proportional noise is added
+    and filtered backprojection applied to produce an initial
+    reconstruction.
 
-    The forward model is the forward radon transform, the backprojection can be chosen as either
-    filtered or unfiltered backprojection, and the prior agent is the bm3d denoiser.
+    The forward model is the forward radon transform, the
+    backprojection can be chosen as either filtered or unfiltered
+    backprojection, and the prior agent is the bm3d denoiser.
     """
 
     # Set basic paramgers
@@ -136,19 +139,23 @@ def ct_demo():
 
 def get_image_and_mask(image_path, imsize=None):
     r"""
+    The images are assumed to mimic single-energy (~100 KeV) CT images
+    with high dynamic range.  The pixel values are in Hounsfield
+    units, with air as 0 and water as 1000.  Hounsfield units are
+    closely related to the atomic weight of the associated material.
+    We then scale so that water is 1 and air is 0.  In these scaled
+    units, steel and other dense metals are about 12 to 15, but may go
+    up to 20.
 
-    The images are assumed to mimic single-energy (~100 KeV) CT images with high dynamic range.
-    The pixel values are in Hounsfield units, with air as 0 and water as 1000. Hounsfield units are closely
-    related to the atomic weight of the associated material. We then scale so that water is 1 and air is 0.
-    In these scaled units, steel and other dense metals are about 12 to 15, but may go up to 20.
+    The demo image has high dynamic range with some characteristics
+    like those seen in CT scans of baggage.
 
-    The demo image has high dynamic range with some characteristics like those seen in
-    CT scans of baggage.
+    With parallel beam CT, only the center circular region can be
+    properly reconstructed.  Here we mask to that region.
 
-    With parallel beam CT, only the center circular region can be properly reconstructed. Here we mask to that region.
-
-    Note that if the image is resized here, then the pixel pitch (physical distance between pixels as
-    measured on the object being imaged) must be adjusted later as part of scaling.
+    Note that if the image is resized here, then the pixel pitch
+    (physical distance between pixels as measured on the object being
+    imaged) must be adjusted later as part of scaling.
 
     Args:
         image_path: path to image file
@@ -313,10 +320,12 @@ def display_images(image_list, image_titles, ground_truth):
     r"""
     Display images to capture high dynamic range.
 
-    Note that these images have a scale bar to indicate the intensity and that all the images are scaled
-    to have the same intensity range. We show several intensity bands to highlight the high dynamic range.
-    The reconstructions have values outside the given range, so the intensities are clipped, but the full range
-    is shown in the titles.
+    Note that these images have a scale bar to indicate the intensity
+    and that all the images are scaled to have the same intensity
+    range.  We show several intensity bands to highlight the high
+    dynamic range.  The reconstructions have values outside the given
+    range, so the intensities are clipped, but the full range is shown
+    in the titles.
 
     Args:
         image_list: list of images to display
