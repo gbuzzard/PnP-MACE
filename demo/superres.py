@@ -26,7 +26,7 @@ from dotmap import DotMap
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
-from skimage.restoration import (denoise_tv_chambolle, denoise_bilateral, denoise_wavelet)
+from skimage.restoration import denoise_tv_chambolle
 
 import pnp_mace as pnpm
 
@@ -34,18 +34,19 @@ import pnp_mace as pnpm
 Load test image.
 """
 print("Reading image and creating noisy, subsampled data.")
-img_path = "https://www.math.purdue.edu/~buzzard/software/cameraman_clean.jpg"
-test_image = pnpm.load_img(img_path)  # create the image
+img_path = "https://raw.githubusercontent.com/bwohlberg/sporco/master/sporco/data/kodim23.png"
+test_image = pnpm.load_img(img_path, convert_to_gray=True, convert_to_float=True)  # create the image
+test_image = np.asarray(Image.fromarray(test_image).crop((100, 100, 356, 312)))
 
 """
 Adjust image shape as needed to allow for up/down sampling.
 """
 factor = 4  # Downsampling factor
-new_size = factor * np.floor(test_image.shape / np.double(factor))
+new_size = factor * np.floor(np.double(test_image.shape) / np.double(factor))
 new_size = new_size.astype(int)
-resized_image = Image.fromarray(test_image).crop((0, 0, new_size[0], new_size[1]))
+resized_image = Image.fromarray(test_image).crop((0, 0, new_size[1], new_size[0]))
 resample = Image.NONE
-ground_truth = np.asarray(resized_image).astype(float) / 255.0
+ground_truth = np.asarray(resized_image)
 clean_data = pnpm.downscale(ground_truth, factor, resample)
 
 """
@@ -99,9 +100,7 @@ Set up the prior agent.
 
 # Set the denoiser for the prior agent
 def denoiser(x, params):
-    # denoised_x = denoise_tv_chambolle(x, weight=params.noise_std)
-    # denoised_x = denoise_bilateral(np.clip(x, a_min=0, a_max=None), sigma_spatial=1.5)
-    # denoised_x = denoise_wavelet(x, sigma=0.2)
+    # denoised_x = denoise_tv_chambolle(x, weight=0.01)
     denoised_x = pnpm.bm3d_method(x, params)
     return denoised_x
 
@@ -109,7 +108,7 @@ def denoiser(x, params):
 prior_agent_method = denoiser
 
 prior_params = DotMap()
-prior_params.noise_std = step_size
+prior_params.noise_std = noise_std
 
 prior_agent = pnpm.PriorAgent(prior_agent_method, prior_params)
 
@@ -133,7 +132,7 @@ Set up the equilibrium problem
 mu0 = 0.5  # Forward agent weight
 mu = [mu0, 1 - mu0]
 rho = 0.5
-num_iters = 10
+num_iters = 20
 keep_all_images = False
 
 equil_params = DotMap()
