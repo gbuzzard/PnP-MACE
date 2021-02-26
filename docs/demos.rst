@@ -16,4 +16,3 @@ Select the demo names below to see more detailed descriptions.
    demo.ct_mace
    demo.superres_mace
    demo.superres_pnp
-   demo
