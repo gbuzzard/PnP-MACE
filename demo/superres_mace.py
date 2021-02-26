@@ -39,7 +39,10 @@ import pnp_mace as pnpm
 
 
 def superres_mace_demo():
-    """Illustrate a MACE reconstruction on an image superresolution problem."""
+    """Illustrate MACE reconstruction on an image superresolution problem."""
+
+    print("\nDemo to illustrate MACE reconstruction on "
+          "an image superresolution problem.\n")
 
     """
     Load test image.

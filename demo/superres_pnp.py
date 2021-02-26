@@ -39,7 +39,10 @@ import pnp_mace as pnpm
 
 
 def superres_pnp_demo():
-    """Illustrate a Plug and Play ADMM reconstruction on an image superresolution problem."""
+    """Illustrate Plug and Play ADMM reconstruction on an image superresolution problem."""
+
+    print("\nDemo to illustrate Plug and Play ADMM reconstruction on "
+          "an image superresolution problem.\n")
 
     """
     Load test image.

@@ -34,6 +34,9 @@ def ct_demo():
     Illustrate a MACE reconstruction on a CT example with high dynamic range.
     """
 
+    print("\nDemo to illustrate MACE reconstruction on a "
+          "CT example with high dynamic range.\n")
+
     # Set basic parameters
     img_path = "https://www.math.purdue.edu/~buzzard/software/image01.png"
     num_views = 60
