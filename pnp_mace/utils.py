@@ -35,9 +35,11 @@ def load_img(path, convert_to_gray=True, convert_to_float=True):
         local_image = local_image.astype(float)
         local_image = local_image / 255.0
 
-    if convert_to_gray and len(local_image.shape) > 2 and local_image.shape[2] == 3:
+    if convert_to_gray and len(local_image.shape) > 2 \
+       and local_image.shape[2] == 3:
         local_image = local_image[:, :, 0] * 299 / 1000 + \
-                      local_image[:, :, 1] * 587 / 1000 + local_image[:, :, 2] * 114 / 1000
+                      local_image[:, :, 1] * 587 / 1000 + \
+                      local_image[:, :, 2] * 114 / 1000
 
     return np.asarray(local_image)
 
@@ -162,7 +164,8 @@ def nrmse(image, reference):
         Root mean square error of the difference of image and reference,
         divided by the root mean square of the reference
     """
-    nrmse = (np.sqrt(np.mean((np.asarray(image) - np.asarray(reference)) ** 2)) /
+    nrmse = (np.sqrt(np.mean((np.asarray(image) -
+                              np.asarray(reference)) ** 2)) /
              np.sqrt(np.mean(np.asarray(reference) ** 2)))
     return np.round(nrmse, decimals=3)
 
