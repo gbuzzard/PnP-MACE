@@ -4,6 +4,20 @@
 # Portions of this file are based on
 # https://github.com/gbuzzard/CT-Tutorial/blob/master/CT_Tutorial.ipynb
 
+"""
+This demo illustrates a 2D tomography example using a
+high-dynamic range phantom.  First the radon transform is applied
+using relatively sparse views.  Then proportional noise is added
+and filtered backprojection applied to produce an initial
+reconstruction.
+
+The forward model is the forward radon transform, the
+backprojection can be chosen as either filtered or unfiltered
+backprojection, and the prior agent can be bm3d, a version of
+TV, wavelet-based denoising, or bilateral.
+"""
+
+
 import imageio
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,16 +31,11 @@ from dotmap import DotMap
 
 def ct_demo():
     r"""
-    Overview: This demo illustrates a 2D tomography example using a
-    high-dynamic range phantom.  First the radon transform is applied
-    using relatively spare views.  Then proportional noise is added
-    and filtered backprojection applied to produce an initial
-    reconstruction.
-
-    The forward model is the forward radon transform, the
-    backprojection can be chosen as either filtered or unfiltered
-    backprojection, and the prior agent is the bm3d denoiser.
+    Illustrate a MACE reconstruction on a CT example with high dynamic range.
     """
+
+    print("\nDemo to illustrate MACE reconstruction on a "
+          "CT example with high dynamic range.\n")
 
     # Set basic parameters
     img_path = "https://www.math.purdue.edu/~buzzard/software/image01.png"
@@ -55,17 +64,15 @@ def ct_demo():
     print("Creating sinogram")
     sinogram, sino_scale = get_scaled_sinogram(ground_truth, theta)
     noisy_sinogram = add_noise(sinogram)
-    print("Constructing FBP reconstruction")
+    print("Creating FBP reconstruction")
     fbp_recon, fbp_noisy_recon = baseline(sinogram, noisy_sinogram,
                                           sino_scale, theta)
 
     #
     # Display the original and reconstructed images
     #
-    image_list = [ground_truth, fbp_recon, fbp_noisy_recon]
-    titles = ['Ground truth',
-              'noise-free FBP',
-              'noisy FBP']
+    image_list = [ground_truth, fbp_noisy_recon]
+    titles = ['Ground truth', 'FBP from noisy data']
     display_images(image_list, titles, ground_truth)
 
     #
@@ -103,10 +110,6 @@ def ct_demo():
     init_recon = fbp_noisy_recon
     one_step_forward = forward_agent.step(np.asarray(init_recon))
     one_step_prior = prior_agent.step(np.asarray(init_recon))
-
-    image_list = [one_step_forward, one_step_prior]
-    titles = ["One step of forward model", "One step of prior model"]
-    display_images(image_list, titles, ground_truth)
 
     #
     # Set up the equilibrium problem
@@ -146,6 +149,8 @@ def ct_demo():
 
 def get_image_and_mask(image_path, imsize=None):
     r"""
+    Load high dynamic range image and specify recon region.
+
     The images in this demo are designed to mimic single-energy (~100
     KeV) CT images with high dynamic range.  The pixel values are in
     Hounsfield units, with air as 0 and water as 1000.  Hounsfield
@@ -201,10 +206,10 @@ def get_image_and_mask(image_path, imsize=None):
 
 def get_scaled_sinogram(ground_truth, theta, image_scale=1):
     r"""
-    Scaling:
+    Apply physically realistic scaling to sinogram.
 
-    All CT scans are relative to a baseline scan with no objects -
-    i.e., a scan of air, which makes air 0.
+    Scaling:  All CT scans are relative to a baseline scan with
+    no objects - i.e., a scan of air, which makes air 0.
 
     The raw projection operator (radon function in python or matlab)
     sums along pixels, with assumed distance 1 between pixels.  To get
@@ -251,8 +256,7 @@ def get_scaled_sinogram(ground_truth, theta, image_scale=1):
 
     Returns:
         sinogram of the ground truth, scaled as described above.
-        sino_scale so that the sinogram is the radon transform times the
-          sino_scale
+        sino_scale so that the sinogram equals radon transform * sino_scale
 
     """
     # Set the sinogram scaling factor
@@ -271,10 +275,10 @@ def get_scaled_sinogram(ground_truth, theta, image_scale=1):
 
 def add_noise(sinogram):
     r"""
-    Noise modeling:
+    Add realistic noise to the sinogram.
 
-    The noise is modeled as additive noise but with variance that
-    depends on the signal.
+    Noise modeling:  The noise is modeled as additive noise but with
+    variance that depends on the signal.
 
     .. math::
         y_{noise} = y + w
@@ -310,7 +314,7 @@ def add_noise(sinogram):
 
 def baseline(sinogram, noisy_sinogram, sino_scale, theta):
     r"""
-    Reconstruction:
+    Use filtered backprojection for baseline recon.
 
     Invert the radon transform using filtered backprojection for both
     the noise-free and noisy sinograms.
