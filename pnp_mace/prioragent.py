@@ -6,11 +6,6 @@
 import pnp_mace.agent as agent
 from bm3d import bm3d
 
-# TODO:
-# Additional denoisers:
-#   https://scikit-image.org/docs/dev/auto_examples/filters/plot_denoise_wavelet.html
-#   https://scikit-learn.org/stable/auto_examples/decomposition/plot_image_denoising.html
-#   NN?
 
 # This file contains the class declaration for PriorAgent as well as particular
 # prior agent methods.
@@ -48,38 +43,6 @@ class PriorAgent(agent.Agent):
 
 
 # Particular prior agent methods
-
-
-def tv_2d(agent_input, params):
-    """
-    Proximal map for anisotropic total variation
-
-    Args:
-        agent_input: full-size reconstruction
-        params:  params.noise_std for noise standard deviation
-
-    Returns:
-        New full-size reconstruction after update
-    """
-    # TODO:  implement using sporco
-    pass
-
-
-def gradient_l2_2d(agent_input, params):
-    """
-    Proximal map for L2 gradient penalty
-
-    Args:
-        agent_input: full-size reconstruction
-        params:  params.noise_std for noise standard deviation
-
-    Returns:
-        New full-size reconstruction after update
-    """
-    # TODO:  implement using sporco
-    pass
-
-
 def bm3d_method(agent_input, params):
     """
     BM3D prior
