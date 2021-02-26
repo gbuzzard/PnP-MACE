@@ -17,6 +17,7 @@ Indices and tables
    readme
    installation
    usage
+   demos
    api
    zreferences
 

@@ -2,7 +2,6 @@
 
 """Utility functions."""
 
-
 import requests
 from io import BytesIO
 
@@ -12,12 +11,13 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from PIL import Image
 
 
-def load_img(path):
+def load_img(path, convert_to_gray=True, convert_to_float=True):
     """Load an image given a filename or url.
 
     Args:
-        path: data path, may be local, or url as a string beginning with
-           http
+        path: data path, may be local, or url as a string beginning with http
+        convert_to_gray:  True to convert color images to grayscale
+        convert_to_float: True to convert to floats and divide by 255
 
     Returns:
         Grayscale image (numpy ndarray)
@@ -29,8 +29,14 @@ def load_img(path):
     else:
         local_image = Image.open(path)  # read image
 
-    local_image = local_image.convert('L')
-    local_image = local_image.convert('F')
+    local_image = np.asarray(local_image)
+
+    if convert_to_float:
+        local_image = local_image.astype(float)
+        local_image = local_image / 255.0
+
+    if convert_to_gray and len(local_image.shape) > 2 and local_image.shape[2] == 3:
+        local_image = local_image[:, :, 0] * 299 / 1000 + local_image[:, :, 1] * 587 / 1000 + local_image[:, :, 2] * 114 / 1000
 
     return np.asarray(local_image)
 
@@ -121,7 +127,7 @@ def downscale(input_image, scale_factor, resample):
     Returns:
         Downscaled image (numpy ndarray)
     """
-    new_image = upscale(input_image, 1/scale_factor, resample)
+    new_image = upscale(input_image, 1 / scale_factor, resample)
     return np.asarray(new_image)
 
 
@@ -155,8 +161,8 @@ def nrmse(image, reference):
         Root mean square error of the difference of image and reference,
         divided by the root mean square of the reference
     """
-    nrmse = (np.sqrt(np.mean((np.asarray(image) - np.asarray(reference))**2)) /
-             np.sqrt(np.mean(np.asarray(reference)**2)))
+    nrmse = (np.sqrt(np.mean((np.asarray(image) - np.asarray(reference)) ** 2)) /
+             np.sqrt(np.mean(np.asarray(reference) ** 2)))
     return np.round(nrmse, decimals=3)
 
 

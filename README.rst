@@ -22,15 +22,30 @@
 
 .. docs-include-ref
 
+Introduction
+------------
 
-This python package includes demonstrations of the PnP algorithm and MACE framework on simple image reconstruction problems.
+This python package provides methods and utilities to explore the PnP algorithm and MACE framework in the context
+of image reconstruction problems, along with some simple demos.  The ideas leading to this package are outlined in
 
-* Free software: BSD license
-* Documentation: https://pnp-mace.readthedocs.io.
+* `A SIAM News overview article from March 2021`_
+* `The 2020 SIAM Imaging Sciences Best Paper Award lecture`_
+
+.. _`A SIAM News overview article from March 2021`: https://sinews.siam.org/Current-Issue
+.. _`The 2020 SIAM Imaging Sciences Best Paper Award lecture`: https://www.youtube.com/watch?v=GjCmxTqAJDo&feature=youtu.be
+
+with more detail in `the papers in the references`_.
+
+.. _`the papers in the references`: https://pnp-mace.readthedocs.io/en/latest/zreferences.html
+
+Documentation on this package is available at https://pnp-mace.readthedocs.io, which
+includes `installation instructions`_.
+
+.. _`installation instructions`: https://pnp-mace.readthedocs.io/en/latest/installation.html
 
 
 Features
---------
+========
 
 * Implementation of basic Plug-and-Play method as described in
 
@@ -39,12 +54,17 @@ Features
 
 __  https://engineering.purdue.edu/~bouman/publications/orig-pdf/tci05.pdf
 
-* Implementation of solution of MACE equations using Mann iterations as in
+* Implementation of the solution of MACE equations using Mann iterations as in
 
     `Plug-and-Play Unplugged: Optimization Free Reconstruction using Consensus Equilibrium,
     *SIAM Journal on Imaging Sciences*, vol. 11, no. 3, pp. 2001-2020, Sept. 2018.`__
 
 __ https://engineering.purdue.edu/~bouman/publications/orig-pdf/SIIMS01.pdf
 
-* Demo code illustrating reconstruction with image subsampling and tomography.
+* `Demo code illustrating reconstruction with image subsampling and tomography`_.
 
+.. _`Demo code illustrating reconstruction with image subsampling and tomography`: https://pnp-mace.readthedocs.io/en/latest/demos.html
+
+This is free software with a `BSD license`_.
+
+.. _`BSD license`: https://github.com/gbuzzard/PnP-MACE/blob/master/LICENSE

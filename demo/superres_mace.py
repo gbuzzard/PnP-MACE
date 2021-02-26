@@ -3,35 +3,30 @@
 # All rights reserved.
 
 r"""
-Overview: A simple demo to demonstrate the solution of a MACE problem
-using Mann iteration and the stacked operators F and G.  The forward
-model is a subsampling operation, and the prior agent is the bm3d
-denoiser.
+Overview:  A simple demo to demonstrate the solution of a MACE problem using Mann iteration and the
+stacked operators F and G.  The forward model is a subsampling operation, and the prior agent is the
+bm3d denoiser.
 
-First a clean image is subsampled, then white noise is added to
-produce noisy data.  This is used to define a forward agent that
-updates to better fit the data.
+First a clean image is subsampled, then white noise is added to produce noisy data.  This is used to
+define a forward agent that updates to better fit the data.
 
-In a classical Bayesian approach, this update has the form :math:`F(x)
-= x + c A^T (y - Ax)`, for a constant c.  In some contexts, it's
-useful to have a mismatched backprojector, which is equivalent to
-replacing :math:`A^T` with an alternative matrix designed to promote
-better or faster reconstruction.  As shown in a paper by Emma Reid,
-this is equivalent to using the standard back projector but changing
-the prior.
+In a classical Bayesian approach, this update has the form :math:`F(x) = x + c A^T (y - Ax)`, for a constant c.
+In some contexts, it's useful to have a mismatched backprojector, which is equivalent to
+replacing :math:`A^T` with an alternative matrix designed to promote better or faster reconstruction.  As
+shown in a paper by Emma Reid, this is equivalent to using the standard back projector but changing the
+prior.
 
-This demo provides the ability to explore mismatched backprojectors by
-changing the upsampling method used to define :math:`A^T`.  It also
-provides the ability to change the relative weight of data-fitting and
-denoising by changing mu.
+This demo provides the ability to explore mismatched backprojectors by changing the upsampling method
+used to define :math:`A^T`.  It also provides the ability to change the relative weight of data-fitting and denoising
+by changing mu.
+
 """
 
 from dotmap import DotMap
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
-from skimage.restoration import (denoise_tv_chambolle, denoise_bilateral,
-                                 denoise_wavelet)
+from skimage.restoration import denoise_tv_chambolle
 
 import pnp_mace as pnpm
 
@@ -39,19 +34,19 @@ import pnp_mace as pnpm
 Load test image.
 """
 print("Reading image and creating noisy, subsampled data.")
-img_path = "https://www.math.purdue.edu/~buzzard/software/cameraman_clean.jpg"
-test_image = pnpm.load_img(img_path)  # create the image
+img_path = "https://raw.githubusercontent.com/bwohlberg/sporco/master/sporco/data/kodim23.png"
+test_image = pnpm.load_img(img_path, convert_to_gray=True, convert_to_float=True)  # create the image
+test_image = np.asarray(Image.fromarray(test_image).crop((100, 100, 356, 312)))
 
 """
 Adjust image shape as needed to allow for up/down sampling.
 """
 factor = 4  # Downsampling factor
-new_size = factor * np.floor(test_image.shape / np.double(factor))
+new_size = factor * np.floor(np.double(test_image.shape) / np.double(factor))
 new_size = new_size.astype(int)
-resized_image = Image.fromarray(test_image).crop((0, 0, new_size[0],
-                                                  new_size[1]))
+resized_image = Image.fromarray(test_image).crop((0, 0, new_size[1], new_size[0]))
 resample = Image.NONE
-ground_truth = np.asarray(resized_image).astype(float) / 255.0
+ground_truth = np.asarray(resized_image)
 clean_data = pnpm.downscale(ground_truth, factor, resample)
 
 """
@@ -59,12 +54,12 @@ Create noisy downsampled image.
 """
 noise_std = 0.05  # Noise standard deviation
 seed = 0          # Seed for pseudorandom noise realization
-noisy_image = pnpm.add_noise(clean_data, noise_std, seed)
+noisy_data = pnpm.add_noise(clean_data, noise_std, seed)
 
 """
 Generate initial solution for MACE.
 """
-init_image = pnpm.upscale(noisy_image, factor, Image.BICUBIC)
+init_image = pnpm.upscale(noisy_data, factor, Image.BICUBIC)
 
 """
 Display test images.
@@ -72,7 +67,7 @@ Display test images.
 fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(9, 9))
 pnpm.display_image(ground_truth, title="Original", fig=fig, ax=ax[0, 0])
 pnpm.display_image(clean_data, title="Downsampled", fig=fig, ax=ax[0, 1])
-pnpm.display_image(noisy_image, title="Noisy downsampled", fig=fig,
+pnpm.display_image(noisy_data, title="Noisy downsampled", fig=fig,
                    ax=ax[1, 0])
 pnpm.display_image_nrmse(init_image, ground_truth,
                          title="Bicubic reconstruction", fig=fig, ax=ax[1, 1])
@@ -96,7 +91,7 @@ def AT(x):
 
 
 step_size = 0.1
-forward_agent = pnpm.LinearProxForwardAgent(noisy_image, A, AT, step_size)
+forward_agent = pnpm.LinearProxForwardAgent(noisy_data, A, AT, step_size)
 
 """
 Set up the prior agent.
@@ -104,9 +99,7 @@ Set up the prior agent.
 
 # Set the denoiser for the prior agent
 def denoiser(x, params):
-    # denoised_x = denoise_tv_chambolle(x, weight=params.noise_std)
-    # denoised_x = denoise_bilateral(np.clip(x, a_min=0, a_max=None), sigma_spatial=1.5)
-    # denoised_x = denoise_wavelet(x, sigma=0.2)
+    # denoised_x = denoise_tv_chambolle(x, weight=0.01)
     denoised_x = pnpm.bm3d_method(x, params)
     return denoised_x
 
@@ -114,15 +107,14 @@ def denoiser(x, params):
 prior_agent_method = denoiser
 
 prior_params = DotMap()
-prior_params.noise_std = step_size
+prior_params.noise_std = noise_std
 
 prior_agent = pnpm.PriorAgent(prior_agent_method, prior_params)
 
 """
 Compute and display one step of forward and prior agents.
 """
-print("Applying one step of each of the forward and prior agents for "
-      "illustration.")
+print("Applying one step of each of the forward and prior agents for illustration.")
 one_step_forward = forward_agent.step(np.asarray(init_image))
 one_step_prior = prior_agent.step(np.asarray(init_image))
 
@@ -139,7 +131,7 @@ Set up the equilibrium problem
 mu0 = 0.5  # Forward agent weight
 mu = [mu0, 1 - mu0]
 rho = 0.5
-num_iters = 10
+num_iters = 20
 keep_all_images = False
 
 equil_params = DotMap()
