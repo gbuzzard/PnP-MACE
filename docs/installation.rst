@@ -30,14 +30,14 @@ you can follow these instructions:
 
 .. code-block:: console
 
-    python3 -m venv new_venv --clear  --upgrade-deps
+    python3 -m venv new_venv
     source new_venv/bin/activate
 
 Otherwise use
 
 .. code-block:: console
 
-    python -m venv new_venv --clear  --upgrade-deps
+    python -m venv new_venv
     source new_venv/bin/activate
 
 After this step, :code:`python` will be mapped to a version of python and supporting code that are appropriate for the pnp_mace package. Even if your original python mapped to version 2, now when you enter :code:`python --version` you should get 3.X.Y.
