@@ -1,5 +1,5 @@
 
-.. image:: docs/_static/PnP-MACE-Logo.svg
+.. image:: https://raw.githubusercontent.com/gbuzzard/PnP-MACE/master/docs/_static/PnP-MACE-Logo.svg
    :width: 320px
    :alt: PnP-MACE logo
    :align: center
