@@ -41,7 +41,7 @@ print("Reading image and creating noisy, subsampled data.")
 img_path = ("https://raw.githubusercontent.com/bwohlberg/sporco/master/"
            "sporco/data/kodim23.png")
 test_image = pnpm.load_img(img_path, convert_to_gray=True,
-                           convert_to_float=True)  # create the image
+                           convert_to_float=True)
 test_image = np.asarray(Image.fromarray(test_image).crop((100, 100, 356, 312)))
 
 """
@@ -50,7 +50,8 @@ Adjust image shape as needed to allow for up/down sampling.
 factor = 4  # Downsampling factor
 new_size = factor * np.floor(np.double(test_image.shape) / np.double(factor))
 new_size = new_size.astype(int)
-resized_image = Image.fromarray(test_image).crop((0, 0, new_size[1], new_size[0]))
+resized_image = Image.fromarray(test_image).crop((0, 0, new_size[1],
+                                                  new_size[0]))
 resample = Image.NONE
 ground_truth = np.asarray(resized_image)
 clean_data = pnpm.downscale(ground_truth, factor, resample)
