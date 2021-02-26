@@ -29,7 +29,7 @@ class PriorAgent(agent.Agent):
         self.method = prior_agent_method
         self.params = params
 
-    def step(self, agent_input):
+    def __call__(self, agent_input):
         """
         Apply the update method one time
 

@@ -26,8 +26,8 @@ class PlugAndPlayADMM:
     def solve(self, verbose_output=True):
         """Compute a solution via ADMM iterations."""
         for niter in range(self.params.num_iters):
-            self.x = self.F.step(self.v - self.u)
-            self.v = self.G.step(self.x + self.u)
+            self.x = self.F(self.v - self.u)
+            self.v = self.G(self.x + self.u)
             self.u += self.x - self.v
             if verbose_output:
                 print("Completed iteration %3d of %3d" %

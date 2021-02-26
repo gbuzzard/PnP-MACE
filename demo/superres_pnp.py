@@ -125,8 +125,8 @@ def superres_pnp_demo():
     """
     Compute and display one step of forward and prior agents.
     """
-    one_step_forward = forward_agent.step(np.asarray(init_image))
-    one_step_prior = prior_agent.step(np.asarray(init_image))
+    one_step_forward = forward_agent(np.asarray(init_image))
+    one_step_prior = prior_agent(np.asarray(init_image))
 
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(9, 5))
     pnpm.display_image_nrmse(one_step_forward, ground_truth,

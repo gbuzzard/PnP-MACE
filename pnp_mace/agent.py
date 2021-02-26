@@ -10,5 +10,5 @@ class Agent:
         pass
 
 
-def step(agent_input):
-    return agent_input
+    def __call__(self, agent_input):
+        return agent_input

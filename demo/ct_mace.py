@@ -108,8 +108,8 @@ def ct_demo():
     # Compute and display one step of forward and prior agents.
     #
     init_recon = fbp_noisy_recon
-    one_step_forward = forward_agent.step(np.asarray(init_recon))
-    one_step_prior = prior_agent.step(np.asarray(init_recon))
+    one_step_forward = forward_agent(np.asarray(init_recon))
+    one_step_prior = prior_agent(np.asarray(init_recon))
 
     #
     # Set up the equilibrium problem

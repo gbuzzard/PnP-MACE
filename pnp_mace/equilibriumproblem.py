@@ -131,7 +131,7 @@ def F(agents, images_in):
     Returns:
         List of output images after applying the agents
     """
-    images_out = [agent.step(img) for agent, img in zip(agents, images_in)]
+    images_out = [agent(img) for agent, img in zip(agents, images_in)]
     return images_out
 
 
