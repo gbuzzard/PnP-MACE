@@ -58,7 +58,8 @@ def display_image_nrmse(input_image, reference_image, title="", cmap='gray',
     display_image(input_image, title=title, cmap=cmap, fig=fig, ax=ax)
 
 
-def display_image(input_image, title=None, vmin=0, vmax=1, cmap='gray', fig=None, ax=None):
+def display_image(input_image, title=None, vmin=0, vmax=1, cmap='gray',
+                  fig=None, ax=None):
     """Display an image in console using :mod:`matplotlib.pyplot`
 
     Args:
@@ -174,11 +175,13 @@ def add_noise(clean_image, noise_std, seed=None):
         seed: seed for random number generator
 
     Returns:
-        image with noise added, clipped to valid range of values (numpy ndarray)
+        image with noise added, clipped to valid range of values
+        (numpy ndarray)
     """
     if seed is not None:
         np.random.seed(seed)
-    noise = noise_std * np.random.standard_normal(np.asarray(clean_image).shape)
+    noise = noise_std * np.random.standard_normal(
+        np.asarray(clean_image).shape)
     noise = np.squeeze(noise)
     noisy_data = np.asarray(clean_image) + noise
     noisy_image = np.clip(noisy_data, 0, 1)

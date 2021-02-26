@@ -23,7 +23,6 @@ class PlugAndPlayADMM:
         self.u = np.zeros(v0.shape)
         self.params = params
 
-
     def solve(self, verbose_output=True):
         """Compute a solution via ADMM iterations."""
         for niter in range(self.params.num_iters):
