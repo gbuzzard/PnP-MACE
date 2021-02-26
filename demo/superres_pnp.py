@@ -139,6 +139,4 @@ pnpm.display_image_nrmse(final_image, ground_truth, title="PnP reconstruction",
                          fig=fig, ax=ax[2])
 fig.show()
 
-
-if __name__ == '__main__':
-    superres_pnp_demo()
+input("Press 'Return' to exit:")
