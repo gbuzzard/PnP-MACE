@@ -3,23 +3,27 @@
 # All rights reserved.
 
 r"""
-Overview:  A simple demo to demonstrate the solution of a MACE problem using Mann iteration and the
-stacked operators F and G.  The forward model is a subsampling operation, and the prior agent is the
-bm3d denoiser.
+Overview: A simple demo to demonstrate the solution of a MACE problem
+using Mann iteration and the stacked operators F and G.  The forward
+model is a subsampling operation, and the prior agent is the bm3d
+denoiser.
 
-First a clean image is subsampled, then white noise is added to produce noisy data.  This is used to
-define a forward agent that updates to better fit the data.
+First a clean image is subsampled, then white noise is added to
+produce noisy data.  This is used to define a forward agent that
+updates to better fit the data.
 
-In a classical Bayesian approach, this update has the form :math:`F(x) = x + c A^T (y - Ax)`, for a constant c.
-In some contexts, it's useful to have a mismatched backprojector, which is equivalent to
-replacing :math:`A^T` with an alternative matrix designed to promote better or faster reconstruction.  As
-shown in a paper by Emma Reid, this is equivalent to using the standard back projector but changing the
-prior.
+In a classical Bayesian approach, this update has the form :math:`F(x)
+= x + c A^T (y - Ax)`, for a constant c.  In some contexts, it's
+useful to have a mismatched backprojector, which is equivalent to
+replacing :math:`A^T` with an alternative matrix designed to promote
+better or faster reconstruction.  As shown in a paper by Emma Reid,
+this is equivalent to using the standard back projector but changing
+the prior.
 
-This demo provides the ability to explore mismatched backprojectors by changing the upsampling method
-used to define :math:`A^T`.  It also provides the ability to change the relative weight of data-fitting and denoising
-by changing mu.
-
+This demo provides the ability to explore mismatched backprojectors by
+changing the upsampling method used to define :math:`A^T`.  It also
+provides the ability to change the relative weight of data-fitting and
+denoising by changing mu.
 """
 
 from dotmap import DotMap
@@ -34,8 +38,10 @@ import pnp_mace as pnpm
 Load test image.
 """
 print("Reading image and creating noisy, subsampled data.")
-img_path = "https://raw.githubusercontent.com/bwohlberg/sporco/master/sporco/data/kodim23.png"
-test_image = pnpm.load_img(img_path, convert_to_gray=True, convert_to_float=True)  # create the image
+img_path = ("https://raw.githubusercontent.com/bwohlberg/sporco/master/"
+           "sporco/data/kodim23.png")
+test_image = pnpm.load_img(img_path, convert_to_gray=True,
+                           convert_to_float=True)  # create the image
 test_image = np.asarray(Image.fromarray(test_image).crop((100, 100, 356, 312)))
 
 """
@@ -114,7 +120,8 @@ prior_agent = pnpm.PriorAgent(prior_agent_method, prior_params)
 """
 Compute and display one step of forward and prior agents.
 """
-print("Applying one step of each of the forward and prior agents for illustration.")
+print("Applying one step of each of the forward and prior agents for "
+      "illustration.")
 one_step_forward = forward_agent.step(np.asarray(init_image))
 one_step_prior = prior_agent.step(np.asarray(init_image))
 
