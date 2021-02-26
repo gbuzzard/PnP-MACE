@@ -30,5 +30,6 @@ class PlugAndPlayADMM:
             self.v = self.G.step(self.x + self.u)
             self.u += self.x - self.v
             if verbose_output:
-                print("Completed iteration " + str(niter+1) + " of " + str(self.params.num_iters))
+                print("Completed iteration %3d of %3d" %
+                      (niter+1, self.params.num_iters))
         return self.v
