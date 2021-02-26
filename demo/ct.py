@@ -51,16 +51,14 @@ def ct_demo():
     print("Creating sinogram")
     sinogram, sino_scale = get_scaled_sinogram(ground_truth, theta)
     noisy_sinogram = add_noise(sinogram)
-    print("Constructing FBP reconstruction")
+    print("Creating FBP reconstruction")
     fbp_recon, fbp_noisy_recon = baseline(sinogram, noisy_sinogram, sino_scale, theta)
 
     #
     # Display the original and reconstructed images
     #
-    image_list = [ground_truth, fbp_recon, fbp_noisy_recon]
-    titles = ['Ground truth',
-              'noise-free FBP',
-              'noisy FBP']
+    image_list = [ground_truth, fbp_noisy_recon]
+    titles = ['Ground truth', 'FBP from noisy data']
     display_images(image_list, titles, ground_truth)
 
     #
@@ -94,10 +92,6 @@ def ct_demo():
     init_recon = fbp_noisy_recon
     one_step_forward = forward_agent.step(np.asarray(init_recon))
     one_step_prior = prior_agent.step(np.asarray(init_recon))
-
-    image_list = [one_step_forward, one_step_prior]
-    titles = ["One step of forward model", "One step of prior model"]
-    display_images(image_list, titles, ground_truth)
 
     #
     # Set up the equilibrium problem
