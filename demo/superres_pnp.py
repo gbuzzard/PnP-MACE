@@ -1,3 +1,17 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) by Greg Buzzard <buzzard@purdue.edu>
+# All rights reserved.
+
+r"""
+Overview: A simple demo to demonstrate the solution of a PnP problem
+The forward model is a subsampling operation, and the prior agent is
+the bm3d denoiser.
+
+First a clean image is subsampled, then white noise is added to
+produce noisy data.  This is used to define a forward agent that
+updates to better fit the data.
+"""
+
 from dotmap import DotMap
 from PIL import Image
 import numpy as np
@@ -9,9 +23,11 @@ import pnp_mace as pnpm
 Load test image.
 """
 print("Reading image and creating noisy, subsampled data.")
-img_path = "https://www.math.purdue.edu/~buzzard/software/cameraman_clean.jpg"
-test_image = pnpm.load_img(img_path, convert_to_gray=True, convert_to_float=True)  # create the image
-ground_truth = test_image
+img_path = ("https://raw.githubusercontent.com/bwohlberg/sporco/master/"
+           "sporco/data/kodim23.png")
+test_image = pnpm.load_img(img_path, convert_to_gray=True,
+                           convert_to_float=True)
+test_image = np.asarray(Image.fromarray(test_image).crop((100, 100, 356, 312)))
 
 """
 Adjust ground truth image shape as needed to allow for up/down sampling.
@@ -19,11 +35,11 @@ Adjust ground truth image shape as needed to allow for up/down sampling.
 factor = 4  # Downsampling factor
 new_size = factor * np.floor(np.double(test_image.shape) / np.double(factor))
 new_size = new_size.astype(int)
-resized_image = Image.fromarray(test_image).crop((0, 0, new_size[1], new_size[0]))
+resized_image = Image.fromarray(test_image).crop((0, 0, new_size[1],
+                                                  new_size[0]))
 resample = Image.NONE
 ground_truth = np.asarray(resized_image)
 clean_data = pnpm.downscale(ground_truth, factor, resample)
-
 
 """
 Create noisy downsampled image.
@@ -66,7 +82,7 @@ def AT(x):
     return pnpm.upscale(x, factor, upscale_type)
 
 
-step_size = 0.08
+step_size = 0.03
 forward_agent = pnpm.LinearProxForwardAgent(noisy_data, A, AT, step_size)
 
 """
@@ -95,8 +111,7 @@ fig.show()
 """
 Set up the plug and play problem
 """
-
-num_iters = 10
+num_iters = 20
 
 pnp_params = DotMap()
 pnp_params.num_iters = num_iters
