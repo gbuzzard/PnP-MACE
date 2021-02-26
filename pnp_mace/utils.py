@@ -35,8 +35,11 @@ def load_img(path, convert_to_gray=True, convert_to_float=True):
         local_image = local_image.astype(float)
         local_image = local_image / 255.0
 
-    if convert_to_gray and len(local_image.shape) > 2 and local_image.shape[2] == 3:
-        local_image = local_image[:, :, 0] * 299 / 1000 + local_image[:, :, 1] * 587 / 1000 + local_image[:, :, 2] * 114 / 1000
+    if convert_to_gray and len(local_image.shape) > 2 \
+       and local_image.shape[2] == 3:
+        local_image = local_image[:, :, 0] * 299 / 1000 + \
+                      local_image[:, :, 1] * 587 / 1000 + \
+                      local_image[:, :, 2] * 114 / 1000
 
     return np.asarray(local_image)
 
@@ -58,7 +61,8 @@ def display_image_nrmse(input_image, reference_image, title="", cmap='gray',
     display_image(input_image, title=title, cmap=cmap, fig=fig, ax=ax)
 
 
-def display_image(input_image, title=None, vmin=0, vmax=1, cmap='gray', fig=None, ax=None):
+def display_image(input_image, title=None, vmin=0, vmax=1, cmap='gray',
+                  fig=None, ax=None):
     """Display an image in console using :mod:`matplotlib.pyplot`
 
     Args:
@@ -160,7 +164,8 @@ def nrmse(image, reference):
         Root mean square error of the difference of image and reference,
         divided by the root mean square of the reference
     """
-    nrmse = (np.sqrt(np.mean((np.asarray(image) - np.asarray(reference)) ** 2)) /
+    nrmse = (np.sqrt(np.mean((np.asarray(image) -
+                              np.asarray(reference)) ** 2)) /
              np.sqrt(np.mean(np.asarray(reference) ** 2)))
     return np.round(nrmse, decimals=3)
 
@@ -174,11 +179,13 @@ def add_noise(clean_image, noise_std, seed=None):
         seed: seed for random number generator
 
     Returns:
-        image with noise added, clipped to valid range of values (numpy ndarray)
+        image with noise added, clipped to valid range of values
+        (numpy ndarray)
     """
     if seed is not None:
         np.random.seed(seed)
-    noise = noise_std * np.random.standard_normal(np.asarray(clean_image).shape)
+    noise = noise_std * np.random.standard_normal(
+        np.asarray(clean_image).shape)
     noise = np.squeeze(noise)
     noisy_data = np.asarray(clean_image) + noise
     noisy_image = np.clip(noisy_data, 0, 1)

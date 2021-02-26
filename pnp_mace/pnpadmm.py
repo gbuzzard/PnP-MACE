@@ -23,7 +23,6 @@ class PlugAndPlayADMM:
         self.u = np.zeros(v0.shape)
         self.params = params
 
-
     def solve(self, verbose_output=True):
         """Compute a solution via ADMM iterations."""
         for niter in range(self.params.num_iters):
@@ -31,5 +30,6 @@ class PlugAndPlayADMM:
             self.v = self.G.step(self.x + self.u)
             self.u += self.x - self.v
             if verbose_output:
-                print("Completed iteration " + str(niter+1) + " of " + str(self.params.num_iters))
+                print("Completed iteration " + str(niter+1) + " of " +
+                      str(self.params.num_iters))
         return self.v
