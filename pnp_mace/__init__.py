@@ -1,6 +1,6 @@
 __author__ = """Gregery T. Buzzard"""
 __email__ = 'buzzard@purdue.edu'
-__version__ = '0.1.0b1'
+__version__ = '0.1.0b2'
 
 from .agent import *
 from .forwardagent import *
