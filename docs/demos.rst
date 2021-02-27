@@ -11,8 +11,10 @@ Select the demo names below to see more detailed descriptions.
 .. autosummary::
    :toctree: _autosummary
    :template: demo_template.rst
+   :caption: Demo Reference
    :recursive:
 
    demo.ct_mace
    demo.superres_mace
    demo.superres_pnp
+   demo
