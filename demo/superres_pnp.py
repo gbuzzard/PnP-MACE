@@ -16,8 +16,9 @@ In a classical Bayesian approach, this update has the form :math:`F(x)
 useful to have a mismatched backprojector, which is equivalent to
 replacing :math:`A^T` with an alternative matrix designed to promote
 better or faster reconstruction.  As shown in a paper by Emma Reid,
-this is equivalent to using the standard back projector but changing
-the prior.
+(in preparation) this is equivalent to using the standard back
+projector but changing the prior.
+
 This demo provides the ability to explore mismatched backprojectors by
 changing the upsampling method used to define :math:`A^T`. It also
 provides the ability to change the relative weight of data-fitting and
@@ -75,7 +76,7 @@ def superres_pnp_demo():
     noisy_data = pnpm.add_noise(clean_data, noise_std, seed)
 
     """
-    Generate initial solution for MACE.
+    Generate initial solution for PnP.
     """
     init_image = pnpm.upscale(noisy_data, factor, Image.BICUBIC)
 

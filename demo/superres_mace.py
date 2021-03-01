@@ -17,8 +17,8 @@ In a classical Bayesian approach, this update has the form :math:`F(x)
 useful to have a mismatched backprojector, which is equivalent to
 replacing :math:`A^T` with an alternative matrix designed to promote
 better or faster reconstruction.  As shown in a paper by Emma Reid,
-this is equivalent to using the standard back projector but changing
-the prior.
+(in preparation), this is equivalent to using the standard back
+projector but changing the prior.
 
 This demo provides the ability to explore mismatched backprojectors by
 changing the upsampling method used to define :math:`A^T`.  It also
@@ -165,7 +165,7 @@ def superres_mace_demo():
     init_images = pnpm.stack_init_image(init_image, len(agents))
 
     """
-    Compute MACE iterations.
+    Compute the Mann iterations to approximate the MACE solution.
     """
     print("Computing the solution.")
     final_images, residuals, vectors, all_images = equil_prob.solve(init_images)
