@@ -41,6 +41,10 @@ with more detail in `the papers in the references`_.
 Documentation on this package is available at https://pnp-mace.readthedocs.io, which
 includes `installation instructions`_.
 
+Demo files are available as python scripts and Jupyter notebooks.  See the `Demos page`_ for more details.
+
+.. _`Demos page`: https://pnp-mace.readthedocs.io/en/latest/demos.html
+
 .. _`installation instructions`: https://pnp-mace.readthedocs.io/en/latest/installation.html
 
 
