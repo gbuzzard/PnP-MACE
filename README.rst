@@ -31,7 +31,7 @@ of image reconstruction problems, along with some simple demos.  The ideas leadi
 * `A SIAM News overview article from March 2021`_
 * `The 2020 SIAM Imaging Sciences Best Paper Award lecture`_
 
-.. _`A SIAM News overview article from March 2021`: https://sinews.siam.org/Current-Issue
+.. _`A SIAM News overview article from March 2021`: https://sinews.siam.org/Details-Page/plug-and-play-a-general-approach-for-the-fusion-of-sensor-and-machine-learning-models
 .. _`The 2020 SIAM Imaging Sciences Best Paper Award lecture`: https://www.youtube.com/watch?v=GjCmxTqAJDo&feature=youtu.be
 
 with more detail in `the papers in the references`_.
