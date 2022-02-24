@@ -79,9 +79,8 @@ def mann_iteration_mace(init_images, agents, params):
     all_images = []
     if ("keep_all_images" in params) and params.keep_all_images:
         save_all_images = True
-        all_images = np.zeros(([init_images[0].shape[0],
-                                init_images[0].shape[1], num_iters]))
-
+        all_images = np.zeros([*init_images[0].shape, num_iters])
+        
     if ("verbose" in params) and params.verbose:
         print_output = True
         print("Starting Mann iterations")
@@ -92,14 +91,14 @@ def mann_iteration_mace(init_images, agents, params):
     for j in range(num_iters):
         if added_noise_std > 0:
             cur_images = [cur + added_noise_std*np.random.randn(
-                cur.shape[0], cur.shape[1]) for cur in cur_images]
+                *cur.shape) for cur in cur_images]
         temp_images = F(agents, cur_images)
         # 2F-I
         temp_images = [2 * temp - cur for temp, cur in zip(
             temp_images, cur_images)]
         next_images = G(mu, temp_images, next_images)
         if save_all_images:
-            all_images[:, :, j] = next_images[0]
+            all_images[..., j] = next_images[0]
         # 2G-I
         next_images = [2 * nxt - temp for nxt, temp in zip(
             next_images, temp_images)]

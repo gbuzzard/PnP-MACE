@@ -283,7 +283,7 @@ def add_noise(sinogram):
     .. math::
         y_{noise} = y + w
 
-    For an entry :math:`y(i)', the noise :math:`w(i)`$` is
+    For an entry :math:`y(i)`, the noise :math:`w(i)`$` is
     :math:`N(0, \sigma^2(i))`$` with
 
     .. math::
