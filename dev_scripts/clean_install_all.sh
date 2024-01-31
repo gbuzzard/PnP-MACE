@@ -1,6 +1,9 @@
 #!/bin/bash
 
 # Create and activate new conda environment
+
+ROOTPATH=$(realpath $(dirname $0)/..)
+
 # First check if the target environment is active and deactivate if so
 NAME=pnp_mace
 if [ "$CONDA_DEFAULT_ENV"==$NAME ]; then
@@ -8,25 +11,22 @@ if [ "$CONDA_DEFAULT_ENV"==$NAME ]; then
 fi
 
 # Then remove the old version and reinstall
-yes | conda remove env --name $NAME --all
-yes | conda create --name $NAME python=3.9
+conda remove env --name $NAME --all -y
+conda create --name $NAME python=3.10 -y
 conda activate $NAME
-pip install -r ../requirements.txt
-pip install ..
 
-pip install -r ../demo/requirements_demo.txt
+pip install -r $ROOTPATH/docs/requirements.txt
+pip install $ROOTPATH
 
-cd ../docs
-/bin/rm -r build
+cd $ROOTPATH/docs
+/bin/rm -rf _build
 
-pip install -r requirements.txt
 make clean html
 
-echo ""
-echo "*** The html documentation is at pcdrecon/docs/build/html/index.html ***"
-echo ""
-
-cd ../dev_scripts
 echo
 echo "Use 'conda activate" $NAME "' to activate this environment."
 echo
+
+echo ""
+echo "*** The html documentation is at PnP-MACE/docs/_build/html/index.html ***"
+echo ""
