@@ -28,7 +28,7 @@ import pnp_mace
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
-# needs_sphinx = '1.0'
+needs_sphinx = '6.0'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
@@ -92,7 +92,7 @@ release = pnp_mace.__version__
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -111,10 +111,10 @@ pygments_style = 'sphinx'
 
 # Intersphinx mapping
 intersphinx_mapping = {
-    "https://docs.python.org/3/": None,
-    "https://docs.scipy.org/doc/numpy/": None,
-    "https://docs.scipy.org/doc/scipy/reference/": None,
-    'https://matplotlib.org/': None
+    "python": ("https://docs.python.org/3/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None)
 }
 
 # -- Options for Napoleon -----------------------------------------------------

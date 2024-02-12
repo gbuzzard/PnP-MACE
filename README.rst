@@ -72,3 +72,21 @@ __ https://engineering.purdue.edu/~bouman/publications/orig-pdf/SIIMS01.pdf
 This is free software with a `BSD license`_.
 
 .. _`BSD license`: https://github.com/gbuzzard/PnP-MACE/blob/master/LICENSE
+
+
+Installation and Demos
+======================
+
+From a terminal in linux or MacOS, change to the dev_scripts directory, and enter::
+
+    source clean_install_all.sh
+    conda activate pnp_mace
+
+This will create and activate a conda environment called pnp_mace.
+
+Then change to the demo directory and and enter::
+
+    python ct_mace.py
+
+(or use any of the other .py files in the demo directory).
+
